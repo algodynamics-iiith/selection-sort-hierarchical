@@ -273,13 +273,13 @@ export default function Experiment() {
     if (type === Action.DiveIntoLevelTwo) {
       router.push("/level-two")
     }
-    // Redirect upon completion.
-    else if (completed) {
-      router.push("/level-zero")
-    }
     // Log run actions.
     else if (runId !== "") {
       updateRun({}, runId, type, preState, state)
+    }
+    // Redirect upon completion.
+    if (completed) {
+      router.push("/level-zero")
     }
   }, [router, userId, runId, type, preState, state, completed])
 

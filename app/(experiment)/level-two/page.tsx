@@ -7,7 +7,7 @@ import CreateArray from "@/app/_components/_constructors/createArray"
 import ThemeToggle from "@/app/_components/_buttons/darkModeToggleButton"
 import { Suspense, useEffect, useState } from "react"
 import API from "@/app/api"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import { selectTheme, selectUserId, SelectionSortState, selectRunId, selectLevelStates, updateUserId, updateRunId, storeLevelStates, selectInitialArray, selectArrayLength } from "@/lib/features/userData/userDataSlice"
 import Loading from "./loading"
@@ -68,7 +68,7 @@ const updateRun = async (
 
 // List of Actions
 const Action = Object.freeze({
-  Init: 'Init',
+  Init: 'InitLevelTwo',
   Undo: 'Undo',
   Redo: 'Redo',
   Reset: 'Reset',
@@ -255,13 +255,13 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
+    // Log run actions.
+    if (runId !== "") {
+      updateRun({}, runId, type, preState, state)
+    }
     // Redirect upon completion.
     if (completed) {
       router.push("/level-one")
-    }
-    // Log run actions.
-    else if (runId !== "") {
-      updateRun({}, runId, type, preState, state)
     }
   }, [router, userId, runId, type, preState, state, completed])
 

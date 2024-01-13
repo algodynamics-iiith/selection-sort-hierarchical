@@ -9,7 +9,7 @@ import { Suspense, useEffect, useState } from "react"
 import API from "@/app/api"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
-import { selectTheme, selectUserId, SelectionSortState, updateUserId, storeLevelStates, updateRunId, selectLevelStates, selectInitialArray } from "@/lib/features/userData/userDataSlice"
+import { selectTheme, selectUserId, SelectionSortState, updateUserId, storeLevelStates, updateRunId, selectLevelStates, selectInitialArray, selectRunId } from "@/lib/features/userData/userDataSlice"
 import Loading from "./loading"
 
 // API Function Calls
@@ -28,7 +28,7 @@ const createRun = async (userId: string, setRunId: React.Dispatch<React.SetState
       .post(
         `/createRun`, JSON.stringify({
           id: userId,
-          machineId: "heapSort",
+          machineId: "selectionSortHierarchical",
         })
       )
       .then((response: any) => {
@@ -122,7 +122,7 @@ const complete = async (id: string, setCompleted: React.Dispatch<React.SetStateA
 
 // List of Actions
 const Action = Object.freeze({
-  Init: 'Init',
+  Init: 'InitLevelZero',
   Undo: 'Undo',
   Redo: 'Redo',
   Reset: 'Reset',
@@ -239,7 +239,7 @@ export default function Experiment() {
   const theme = useAppSelector(selectTheme)
   const initialArray = useAppSelector(selectInitialArray)
   const initialState = useAppSelector(selectLevelStates)[levelNumber]
-  const [runId, setRunId] = useState<string>("")
+  const [runId, setRunId] = useState<string>(useAppSelector(selectRunId))
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
   const [state, setState] = useState<SelectionSortState>(initialState.current)
   const [pastStates, setPastStates] = useState<SelectionSortState[]>([])
@@ -353,13 +353,13 @@ export default function Experiment() {
     else if (type === Action.DiveIntoLevelOne) {
       router.push("/level-one")
     }
-    // Redirect upon completion.
-    else if (completed) {
-      router.push("/thanks")
-    }
     // Log run actions.
     else if (runId !== "") {
       updateRun({}, runId, type, preState, state)
+    }
+    // Redirect upon completion.
+    if (completed) {
+      router.push("/thanks")
     }
   }, [router, userId, runId, type, preState, state, completed])
 
