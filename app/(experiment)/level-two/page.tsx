@@ -9,7 +9,7 @@ import { Suspense, useEffect, useState } from "react"
 import API from "@/app/api"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
-import { selectTheme, selectUserId, SelectionSortState, selectRunId, selectLevelStates, updateUserId, updateRunId, storeLevelStates, selectInitialArray } from "@/lib/features/userData/userDataSlice"
+import { selectTheme, selectUserId, SelectionSortState, selectRunId, selectLevelStates, updateUserId, updateRunId, storeLevelStates, selectInitialArray, selectArrayLength } from "@/lib/features/userData/userDataSlice"
 import Loading from "./loading"
 
 // API Function Calls
@@ -157,6 +157,7 @@ export default function Experiment() {
   const userId = useAppSelector(selectUserId)
   const theme = useAppSelector(selectTheme)
   const runId = useAppSelector(selectRunId)
+  const arrayLength = useAppSelector(selectArrayLength)
   const initialArray = useAppSelector(selectInitialArray)
   const initialState = useAppSelector(selectLevelStates)[levelNumber - 1]
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
@@ -336,7 +337,7 @@ export default function Experiment() {
                   <ActionButton
                     id="inc"
                     type="primary"
-                    disabled={state.i >= state.array.length - 1}
+                    disabled={state.i >= arrayLength - 1}
                     handler={() => handleIncrementI()}
                   >
                     Increment i

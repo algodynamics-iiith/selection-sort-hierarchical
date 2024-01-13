@@ -15,35 +15,6 @@ import Loading from "./loading"
 // API Function Calls
 
 /**
- * API call to create a run for a userId and set the runId.
- * @param userId The userId of the user.
- * @param setRunId Function to set the runId.
- */
-// const createRun = async (userId: string, setRunId: React.Dispatch<React.SetStateAction<string>>) => {
-//   console.log("Creating runId.")
-//   // If API Gateway is defined.
-//   if (API.getUri() !== undefined) {
-//     // API call.
-//     await API
-//       .post(
-//         `/createRun`, JSON.stringify({
-//           id: userId,
-//           machineId: "heapSort",
-//         })
-//       )
-//       .then((response: any) => {
-//         // Set the runId.
-//         setRunId(response.data.id)
-//       })
-//       .catch((error: any) => {
-//         console.log(error)
-//       })
-//   }
-//   // If testing.
-//   else { setRunId("testRunID") }
-// }
-
-/**
  * API call to update the Run parameters.
  * @param payload Payload for the API.
  * @param runId The runId of the current run.

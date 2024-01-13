@@ -142,5 +142,6 @@ export const selectRunId = (state: RootState) => state.userData.runId
 export const selectTheme = (state: RootState) => state.userData.theme
 export const selectLevelStates = (state: RootState) => state.userData.levelStates
 export const selectInitialArray = () => initialArray
+export const selectArrayLength = () => arrayLength
 
 export default userDataSlice.reducer
