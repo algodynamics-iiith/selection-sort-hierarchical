@@ -151,14 +151,12 @@ const levelNumber = 2
 export default function Experiment() {
   // Router for navigation between pages.
   const router = useRouter()
-  // Store Reducer dispatcher.
-  const dispatch = useAppDispatch()
   // Initialisation.
   const userId = useAppSelector(selectUserId)
   const theme = useAppSelector(selectTheme)
   const runId = useAppSelector(selectRunId)
-  const arrayLength = useAppSelector(selectArrayLength)
   const initialArray = useAppSelector(selectInitialArray)
+  const arrayLength = initialArray.length
   const initialState = useAppSelector(selectLevelStates)[levelNumber - 1]
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
   const [state, setState] = useState<SelectionSortState>(initialState.current)
