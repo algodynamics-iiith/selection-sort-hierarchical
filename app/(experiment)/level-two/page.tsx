@@ -253,6 +253,17 @@ export default function Experiment() {
     setCompleted(true)
   }
 
+  function checkSorted() {
+    let sorted: boolean = true
+    for (let index = 1; index < state.array.length; index++) {
+      if (state.array[index] < state.array[index - 1]) {
+        sorted = false
+        break
+      }
+    }
+    return sorted
+  }
+
   // Log actions.
   useEffect(() => {
     // Log run actions.
@@ -279,7 +290,7 @@ export default function Experiment() {
           <ThemeToggle />
           <Suspense fallback={null}>
             {/* Done Button */}
-            <button
+            {/* <button
               type='button'
               className='transition ease-out hover:scale-110 hover:duration-400
                 px-2 py-1 border-2 border-white/75 hover:border-white hover:bg-slate-50/10 rounded-full
@@ -287,7 +298,7 @@ export default function Experiment() {
               onClick={() => handleDone()}
             >
               Done
-            </button>
+            </button> */}
           </Suspense>
         </div>
       </header>
@@ -307,11 +318,11 @@ export default function Experiment() {
                 <div className="w-full">
                   <div
                     className={"text-center m-4 p-2 rounded-md border-2 text-black "
-                    + ((prompt === Prompts.DecrementAndResetFail || prompt === Prompts.IncrementFail)
-                      ? "bg-red-300 border-red-400"
-                      : (prompt === Prompts.DecrementAndReset || prompt === Prompts.Increment || prompt === Prompts.SwapMax || prompt === Prompts.UpdateMax)
-                        ? "bg-green-300 border-green-400"
-                        : "bg-blue-300 border-blue-400"
+                      + ((prompt === Prompts.DecrementAndResetFail || prompt === Prompts.IncrementFail)
+                        ? "bg-red-300 border-red-400"
+                        : (prompt === Prompts.DecrementAndReset || prompt === Prompts.Increment || prompt === Prompts.SwapMax || prompt === Prompts.UpdateMax)
+                          ? "bg-green-300 border-green-400"
+                          : "bg-blue-300 border-blue-400"
                       )
                     }
                   >
@@ -319,50 +330,61 @@ export default function Experiment() {
                   </div>
                 </div>
                 {/* Variables */}
-                <div className="flex flex-row w-full items-center justify-center h-1/2">
-                  <div className="flex flex-col text-center w-1/6 p-1 text-xl">
-                    i = {state.i}
-                    <br />
-                    max = {state.max}
-                    <br />
-                    b = {state.b}
+                <div className="grid grid-cols-1 grid-rows-3 w-full items-center justify-center h-1/2">
+                  <div className="flex w-full h-full row-start-2 justify-start items-start overflow-visible">
+                    <div className="flex flex-col justify-center items-center text-center w-1/6 h-full p-1 text-xl">
+                      i = {state.i}
+                      <br />
+                      max = {state.max}
+                      <br />
+                      b = {state.b}
+                    </div>
+                    <CreateArray array={state.array} selected={state.max} sorted={checkSorted()} currentIndex={state.i} currentBoundary={state.b} />
                   </div>
-                  <CreateArray array={state.array} selected={state.i} />
                 </div>
                 {/* Buttons */}
                 <div className="flex flex-col items-center space-y-2 p-2">
                   <div className="flex justify-between">
-                  <ActionButton
-                    id="inc"
-                    type="primary"
-                    disabled={state.i >= arrayLength - 1}
-                    handler={() => handleIncrementI()}
-                  >
-                    Increment i
-                  </ActionButton>
-                  <ActionButton
-                    id="update"
-                    type="primary"
-                    handler={() => handleUpdateMax()}
-                  >
-                    Update max
-                  </ActionButton>
-                  <ActionButton
-                    id="swap"
-                    type="primary"
-                    disabled={state.b < 1}
-                    handler={() => handleSwapMax()}
-                  >
-                    Swap max
-                  </ActionButton>
-                  <ActionButton
-                    id="dec"
-                    type="primary"
-                    disabled={state.b <= 0}
-                    handler={() => handleDecrementAndReset()}
-                  >
-                    Decrement b, Reset i and max
-                  </ActionButton>
+                    <ActionButton
+                      id="inc"
+                      type="primary"
+                      disabled={state.i >= arrayLength - 1}
+                      handler={() => handleIncrementI()}
+                    >
+                      Increment i
+                    </ActionButton>
+                    <ActionButton
+                      id="update"
+                      type="primary"
+                      handler={() => handleUpdateMax()}
+                    >
+                      Update max
+                    </ActionButton>
+                    {/* <ActionButton
+                      id="swap"
+                      type="primary"
+                      disabled={state.b < 1}
+                      handler={() => handleSwapMax()}
+                    >
+                      Swap max
+                    </ActionButton> */}
+                    {/* <ActionButton
+                      id="dec"
+                      type="primary"
+                      disabled={state.b <= 0}
+                      handler={() => handleDecrementAndReset()}
+                    >
+                      Decrement b, Reset i and max
+                    </ActionButton> */}
+                  </div>
+                  <div className="flex justify-between">
+                    <ActionButton
+                      id="select-sort-dive"
+                      type="subset"
+                      handler={() => handleDone()}
+                    >
+                      Exit Level
+                    </ActionButton>
                   </div>
                   <div className="flex justify-between">
                     <ActionButton

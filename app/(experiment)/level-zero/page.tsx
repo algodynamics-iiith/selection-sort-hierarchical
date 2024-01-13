@@ -242,8 +242,8 @@ export default function Experiment() {
   const [runId, setRunId] = useState<string>(useAppSelector(selectRunId))
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
   const [state, setState] = useState<SelectionSortState>(initialState.current)
-  const [pastStates, setPastStates] = useState<SelectionSortState[]>([])
-  const [futureStates, setFutureStates] = useState<SelectionSortState[]>([])
+  const [pastStates, setPastStates] = useState<SelectionSortState[]>(initialState.previous)
+  const [futureStates, setFutureStates] = useState<SelectionSortState[]>(initialState.next)
   const [type, setType] = useState<string>(Action.Init)
   const [prompt, setPrompt] = useState<string>(Prompts.Init)
   const [completed, setCompleted] = useState<boolean>(false)
@@ -277,8 +277,8 @@ export default function Experiment() {
     dispatch(storeLevelStates({
       level: levelNumber + 1,
       currentState: { ...state },
-      previousStates: pastStates.slice(),
-      nextStates: futureStates.slice(),
+      previousStates: [],
+      nextStates: [],
     }))
   }
 
@@ -341,6 +341,17 @@ export default function Experiment() {
     setPrompt(Prompts.CancelSubmit)
   }
 
+  function checkSorted() {
+    let sorted: boolean = true
+    for (let index = 1; index < state.array.length; index++) {
+      if (state.array[index] < state.array[index - 1]) {
+        sorted = false
+        break
+      }
+    }
+    return sorted
+  }
+
   // Log actions.
   useEffect(() => {
     console.log(userId)
@@ -384,7 +395,7 @@ export default function Experiment() {
                 text-xl font-semibold text-slate-50'
               onClick={() => handleSubmit()}
             >
-              Done
+              Submit
             </button>
           </Suspense>
         </div>
@@ -444,14 +455,14 @@ export default function Experiment() {
                 </div>
                 {/* Variables */}
                 <div className="flex flex-row w-full items-center justify-center h-1/2">
-                  <div className="flex flex-col text-center w-1/6 p-1 text-xl">
+                  {/* <div className="flex flex-col text-center w-1/6 p-1 text-xl">
                     i = {state.i}
                     <br />
                     max = {state.max}
                     <br />
                     b = {state.b}
-                  </div>
-                  <CreateArray array={state.array} selected={state.i} />
+                  </div> */}
+                  <CreateArray array={state.array} sorted={checkSorted()} hideIndex />
                 </div>
                 {/* Buttons */}
                 <div className="flex flex-col items-center space-y-2 p-2">
@@ -467,7 +478,7 @@ export default function Experiment() {
                     type="subset"
                     handler={() => handleDiveIntoLevelOne()}
                   >
-                    Dive Into Function
+                    Dive Into Selection Sort
                   </ActionButton>
                   <div className="flex justify-between">
                     <ActionButton

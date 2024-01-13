@@ -5,18 +5,24 @@ export default function ArrayElement({
   index,
   id,
   handler,
-  highlight
+  highlight,
+  sorted,
 }: {
   value: any
   index: number | string
   id?: string
   handler?: Function
   highlight?: boolean
+  sorted?: boolean
 }) {
   return (
     <span
       className={"flex justify-center p-3 border-2 border-sky-600 text-black text-2xl rounded-lg "
-        + (highlight ? "border-dashed bg-yellow-300" : "border-solid bg-sky-300")}
+        + (highlight
+          ? "border-dashed bg-yellow-300"
+          : sorted
+            ? "border-solid bg-green-300"
+            : "border-solid bg-slate-300")}
       key={index}
       onClick={handler ? () => handler() : handler}
       id={id}

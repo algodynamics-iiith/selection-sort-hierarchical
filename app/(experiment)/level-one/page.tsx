@@ -161,8 +161,8 @@ export default function Experiment() {
   const initialState = useAppSelector(selectLevelStates)[levelNumber]
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
   const [state, setState] = useState<SelectionSortState>(initialState.current)
-  const [pastStates, setPastStates] = useState<SelectionSortState[]>([])
-  const [futureStates, setFutureStates] = useState<SelectionSortState[]>([])
+  const [pastStates, setPastStates] = useState<SelectionSortState[]>(initialState.previous)
+  const [futureStates, setFutureStates] = useState<SelectionSortState[]>(initialState.next)
   const [type, setType] = useState<string>(Action.Init)
   const [prompt, setPrompt] = useState<string>(Prompts.Init)
   const [completed, setCompleted] = useState<boolean>(false)
@@ -214,15 +214,15 @@ export default function Experiment() {
     dispatch(updateRunId(runId))
     dispatch(storeLevelStates({
       level: levelNumber,
-      currentState: {...state},
+      currentState: { ...state },
       previousStates: pastStates.slice(),
       nextStates: futureStates.slice(),
     }))
     dispatch(storeLevelStates({
       level: levelNumber + 1,
-      currentState: {...state},
-      previousStates: pastStates.slice(),
-      nextStates: futureStates.slice(),
+      currentState: { ...state },
+      previousStates: [],
+      nextStates: [],
     }))
   }
 
@@ -267,6 +267,17 @@ export default function Experiment() {
     setCompleted(true)
   }
 
+  function checkSorted() {
+    let sorted: boolean = true
+    for (let index = 1; index < state.array.length; index++) {
+      if (state.array[index] < state.array[index - 1]) {
+        sorted = false
+        break
+      }
+    }
+    return sorted
+  }
+
   // Log actions.
   useEffect(() => {
     // Redirect to lower level upon clicking Dive In Find Max.
@@ -297,7 +308,7 @@ export default function Experiment() {
           <ThemeToggle />
           <Suspense fallback={null}>
             {/* Done Button */}
-            <button
+            {/* <button
               type='button'
               className='transition ease-out hover:scale-110 hover:duration-400
                 px-2 py-1 border-2 border-white/75 hover:border-white hover:bg-slate-50/10 rounded-full
@@ -305,7 +316,7 @@ export default function Experiment() {
               onClick={() => handleDone()}
             >
               Done
-            </button>
+            </button> */}
           </Suspense>
         </div>
       </header>
@@ -335,15 +346,17 @@ export default function Experiment() {
                   </div>
                 </div>
                 {/* Variables */}
-                <div className="flex flex-row w-full items-center justify-center h-1/2">
-                  <div className="flex flex-col text-center w-1/6 p-1 text-xl">
-                    i = {state.i}
-                    <br />
-                    max = {state.max}
-                    <br />
-                    b = {state.b}
+                <div className="grid grid-cols-1 grid-rows-3 w-full items-center justify-center h-1/2">
+                  <div className="flex w-full h-full row-start-2 justify-start items-start overflow-visible">
+                    <div className="flex flex-col justify-center items-center text-center w-1/6 h-full p-1 text-xl">
+                      {/* i = {state.i}
+                      <br />
+                      max = {state.max}
+                      <br /> */}
+                      b = {state.b}
+                    </div>
+                    <CreateArray array={state.array} selected={state.max} sorted={checkSorted()} currentBoundary={state.b} />
                   </div>
-                  <CreateArray array={state.array} selected={state.max} />
                 </div>
                 {/* Buttons */}
                 <div className="flex flex-col items-center space-y-2 p-2">
@@ -372,13 +385,22 @@ export default function Experiment() {
                       Decrement Boundary, Reset Index and Max
                     </ActionButton>
                   </div>
-                  <ActionButton
-                    id="select-sort-dive"
-                    type="subset"
-                    handler={() => handleDiveIntoLevelTwo()}
-                  >
-                    Dive Into Function
-                  </ActionButton>
+                  <div className="flex justify-between">
+                    <ActionButton
+                      id="select-sort-dive"
+                      type="subset"
+                      handler={() => handleDiveIntoLevelTwo()}
+                    >
+                      Dive Into Find Max
+                    </ActionButton>
+                    <ActionButton
+                      id="select-sort-dive"
+                      type="subset"
+                      handler={() => handleDone()}
+                    >
+                      Exit Level
+                    </ActionButton>
+                  </div>
                   <div className="flex justify-between">
                     <ActionButton
                       id="undo"

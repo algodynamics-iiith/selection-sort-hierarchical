@@ -89,13 +89,13 @@ const initialState: UserDataState = {
     },
     // Level 1 - Find Max, Swap Max, Decrement And Reset
     {
-      current: initialSelectionSortState,
+      current: {} as SelectionSortState,
       previous: [],
       next: [],
     },
     // Level 2 - Increment I, Update Max, Swap Max, Decrement And Reset
     {
-      current: initialSelectionSortState,
+      current: {} as SelectionSortState,
       previous: [],
       next: [],
     },
