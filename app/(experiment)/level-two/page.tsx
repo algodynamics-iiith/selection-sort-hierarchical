@@ -255,7 +255,7 @@ export default function Experiment() {
 
   function checkSorted() {
     let sorted: boolean = true
-    for (let index = 1; index < state.array.length; index++) {
+    for (let index = 1; index < arrayLength; index++) {
       if (state.array[index] < state.array[index - 1]) {
         sorted = false
         break
