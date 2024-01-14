@@ -35,7 +35,7 @@ export default function Home() {
         className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-sky-600 via-blue-600 to-sky-600 shadow-lg'}
       >
         <div className={"px-4 font-sans text-2xl font-bold text-slate-50 col-span-2 col-start-2 justify-self-center"}>
-          Driving Test - Heap Sort Algorithm
+          Driving Test - Selection Sort Algorithm
         </div>
         <div className="flex col-start-4 justify-center items-center">
           <ThemeToggle />
