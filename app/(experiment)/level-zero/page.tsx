@@ -238,7 +238,6 @@ export default function Experiment() {
   const userId = useAppSelector(selectUserId)
   const theme = useAppSelector(selectTheme)
   const initialArray = useAppSelector(selectInitialArray)
-  const arrayLength = initialArray.length
   const initialState = useAppSelector(selectLevelStates)[levelNumber]
   const [runId, setRunId] = useState<string>(useAppSelector(selectRunId))
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
@@ -344,7 +343,7 @@ export default function Experiment() {
 
   function checkSorted() {
     let sorted: boolean = true
-    for (let index = 1; index < arrayLength; index++) {
+    for (let index = 1; index < state.array.length; index++) {
       if (state.array[index] < state.array[index - 1]) {
         sorted = false
         break
