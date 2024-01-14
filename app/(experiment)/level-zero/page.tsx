@@ -395,7 +395,7 @@ export default function Experiment() {
                 text-xl font-semibold text-slate-50'
               onClick={() => handleSubmit()}
             >
-              Submit
+              Submit Run
             </button>
           </Suspense>
         </div>

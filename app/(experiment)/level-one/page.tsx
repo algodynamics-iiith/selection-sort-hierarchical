@@ -382,7 +382,7 @@ export default function Experiment() {
                       disabled={state.b <= 0}
                       handler={() => handleDecrementBResetMaxI()}
                     >
-                      Decrement Boundary, Reset Index and Max
+                      Decrement Boundary
                     </ActionButton>
                   </div>
                   <div className="flex justify-between">
@@ -391,7 +391,7 @@ export default function Experiment() {
                       type="subset"
                       handler={() => handleDiveIntoLevelTwo()}
                     >
-                      Dive Into Find Max
+                      Dive Into Find Max Element
                     </ActionButton>
                     <ActionButton
                       id="select-sort-dive"

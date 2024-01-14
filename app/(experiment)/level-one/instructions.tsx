@@ -28,22 +28,6 @@ export default function Information() {
           </thead>
           <tbody>
             <tr>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>i</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n)</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>0</td>
-            </tr>
-          </tbody>
-          <tbody>
-            <tr>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>max</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n)</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>0</td>
-            </tr>
-          </tbody>
-          <tbody>
-            <tr>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>b</td>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n]</td>
@@ -64,37 +48,36 @@ export default function Information() {
           </thead>
           <tbody>
             <tr>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Increment i</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Increments i by 1, if i &lt; n - 1</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Find Max Element</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Finds the index of the max element between indexes [0,b)</td>
             </tr>
           </tbody>
           <tbody>
             <tr>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Update max and Increment i</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Updates the value of max as i and increments i by 1, if i &lt; n - 1</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Swap Boundary and Max Elements</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Swaps the max array element with the array element with index b - 1</td>
             </tr>
           </tbody>
           <tbody>
             <tr>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Swap max</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Swaps the array indices of max and b - 1</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Decrement Boundary</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Decrements b by 1 if b &gt; 0</td>
             </tr>
           </tbody>
           <tbody>
             <tr>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Decrement b, Reset i and max</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Decrements b by 1 and resets i and max to 0, if b &gt; 0</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Dive Into Find Max Element</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>Enter into lower level abstraction of Find Max Element function</td>
             </tr>
           </tbody>
         </table>
-        <p>where n is the length of the array.</p>
       </div>
       <div className="m-1 space-y-2">
         <h1 className="text-center font-bold text-lg">Procedure</h1>
         <ol className="list-decimal ps-5">
-          <li>Click on suitable control to simulate next step of selection sort algorithm.</li>
-          <li>You can <em>Undo</em> and <em>Redo</em> actions or <em>Reset</em> the experiment by clicking on the respective buttons as per your need.</li>
-          <li>Click on the <em>Submit Run</em> button when you are done.</li>
+          <li>Click on the suitable control to simulate the selection sort algorithm.</li>
+          <li>You can <em>Undo</em> and <em>Redo</em> actions or <em>Reset</em> the experiment by clicking on the respective buttons.</li>
+          <li>Click on the <em>Exit Level</em> button when you wish to exit out of current level of abstraction.</li>
         </ol>
       </div>
     </div>
