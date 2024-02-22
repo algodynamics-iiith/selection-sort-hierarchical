@@ -28,7 +28,7 @@
 
 ;;; rho find-max
 (define rho-find-max
-  ;; rho : [(A, b) -> (A, i, m , b)]
+  ;; rho : [(A, b) -> (A, i, m, b)]
   (lambda (a-b)
     (match a-b
       [(list array b) (list array 0 0 b)])))

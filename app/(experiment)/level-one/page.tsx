@@ -9,8 +9,18 @@ import { Suspense, useEffect, useState } from "react"
 import API from "@/app/api"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
-import { selectTheme, selectUserId, SelectionSortState, selectRunId, selectLevelStates, updateUserId, updateRunId, storeLevelStates, selectInitialArray } from "@/lib/features/userData/userDataSlice"
+import {
+  selectTheme,
+  selectUserId,
+  SelectionSortState,
+  selectRunId,
+  selectLevelState,
+  storeLevelState,
+  LevelStateData
+} from "@/lib/features/userData/userDataSlice"
 import Loading from "./loading"
+
+const levelNumber = 1
 
 // API Function Calls
 
@@ -18,6 +28,7 @@ import Loading from "./loading"
  * API call to update the Run parameters.
  * @param payload Payload for the API.
  * @param runId The runId of the current run.
+ * @param level The level number.
  * @param type The action performed.
  * @param preState The state before the action.
  * @param postState The state after the action.
@@ -25,6 +36,7 @@ import Loading from "./loading"
 const updateRun = async (
   payload: any,
   runId: string,
+  level: number,
   type: string,
   preState: SelectionSortState,
   postState: SelectionSortState
@@ -37,6 +49,7 @@ const updateRun = async (
   console.log(JSON.stringify({
     id: runId,
     payload: payload === undefined ? {} : payload,
+    level: level,
     type: type,
     preState: preState === undefined ? {} : preState,
     postState: postState === undefined ? {} : postState,
@@ -47,9 +60,11 @@ const updateRun = async (
     // API call.
     await API
       .post(
-        `/updateRun`, JSON.stringify({
+        `/updateRun`,
+        JSON.stringify({
           id: runId,
           payload: payload === undefined ? {} : payload,
+          level: level,
           type: type,
           preState: preState === undefined ? {} : preState,
           postState: postState === undefined ? {} : postState,
@@ -95,6 +110,25 @@ const Prompts = Object.freeze({
 })
 
 /**
+ * Function to create an instance of the level state.
+ * @param level Level number.
+ * @param status Boolean of whether the level is active or not.
+ * @param timeline Action timeline.
+ * @param stateIndex Index of timeline element indicating the current experiment state.
+ * @returns 
+ */
+function createLevelState(level: number, status: boolean, timeline: SelectionSortState[], stateIndex: number): LevelStateData {
+  let levelState: LevelStateData = {} as LevelStateData
+
+  levelState.level = level
+  levelState.activityStatus = status
+  levelState.stateTimeline = timeline
+  levelState.currentStateIndex = stateIndex
+
+  return levelState
+}
+
+/**
  * Function that creates an instance of a Selection Sort State.
  * @param array Array of numbers.
  * @param i Current index.
@@ -102,13 +136,14 @@ const Prompts = Object.freeze({
  * @param b Boundary index.
  * @returns SelectionSortState instance.
  */
-function createState(array: number[], i: number, max: number, b: number): SelectionSortState {
+function createState(array: number[], i: number, max: number | undefined, b: number): SelectionSortState {
   let state: SelectionSortState = {} as SelectionSortState
 
   state.array = array
   state.b = b
   state.i = i
   state.max = max
+  state.lowerlevel = {} as LevelStateData
 
   return state
 }
@@ -123,30 +158,73 @@ function createState(array: number[], i: number, max: number, b: number): Select
 // const prompt = "Experiment Initialised."
 
 /**
- * Function to update the array containing list of previous states.
- * @param pastStates Array with list of previous states.
- * @param state State to be added.
- * @returns Updated past states array.
+ * Function to initialise the Action timeline.
+ * @param levelState LevelStateData from redux store.
+ * @returns Timeline of Action history.
  */
-function handlePastStateUpdate(pastStates: SelectionSortState[], state: SelectionSortState) {
-  let newPastStateArray = pastStates.slice()
-  newPastStateArray.push({ ...state })
-  return newPastStateArray
-}
+function initLevelState(levelState: LevelStateData) {
+  let state = { ...levelState }
+  let level = levelNumber
 
-/**
- * Function to update the array containing list of future states.
- * @param futureStates Array with list of future states.
- * @param state State to be added.
- * @returns Updated future states array.
- */
-function handleFutureStateUpdate(futureStates: SelectionSortState[], state: SelectionSortState) {
-  let newFutureStateArray = futureStates.slice()
-  newFutureStateArray.unshift({ ...state })
-  return newFutureStateArray
-}
+  while (level > 0) {
+    // If lower LevelStateData doesn't exist
+    if (Object.keys(state.stateTimeline[state.currentStateIndex].lowerlevel).length === 0) {
+      // Create lower level SelectionSortState data
+      const newState = createState(
+        state.stateTimeline[state.currentStateIndex].array,
+        state.stateTimeline[state.currentStateIndex].i,
+        state.stateTimeline[state.currentStateIndex].max,
+        state.stateTimeline[state.currentStateIndex].b
+      )
 
-const levelNumber = 1
+      // Create and store lower LevelStateData
+      state = createLevelState(
+        levelState.level - state.level + 1,
+        true,
+        [newState],
+        0
+      )
+
+      // Return the state.
+      return state
+    }
+    // If lower LevelStateData exists
+    else {
+      // Update state to the lower state
+      state = state.stateTimeline[state.currentStateIndex].lowerlevel
+    }
+
+    // Decrement level counter
+    level -= 1
+  }
+
+  // If there was a modification of SelectionSortState in the lower level, 
+  // remove all actions after current state index
+  // and add the new state as the latest action.
+  if (Object.keys(state.stateTimeline[state.currentStateIndex].lowerlevel).length !== 0) {
+    const currentState = state.stateTimeline[state.currentStateIndex]
+    const lowerLevelState = state.stateTimeline[state.currentStateIndex].lowerlevel
+    let newState = { ...lowerLevelState.stateTimeline[lowerLevelState.currentStateIndex] }
+
+    // Check if lower state and current state values match. 
+    // If not, update the current timeline with the new state entry.
+    if ((currentState.b !== newState.b) || (currentState.i !== newState.i) || (currentState.max !== newState.max)) {
+      // New timeline.
+      let newTimeline = state.stateTimeline.slice(0, state.currentStateIndex + 1)
+      newTimeline.push(createState(
+        newState.array,
+        newState.i,
+        newState.max,
+        newState.b))
+
+      // New level state.
+      state = createLevelState(state.level, true, newTimeline, newTimeline.length - 1)
+    }
+  }
+  console.log("level:", levelNumber, "initLevelState:", state)
+
+  return state
+}
 
 export default function Experiment() {
   // Router for navigation between pages.
@@ -157,111 +235,110 @@ export default function Experiment() {
   const userId = useAppSelector(selectUserId)
   const theme = useAppSelector(selectTheme)
   const runId = useAppSelector(selectRunId)
-  const initialArray = useAppSelector(selectInitialArray)
-  const initialState = useAppSelector(selectLevelStates)[levelNumber]
+  const initialLevelState = initLevelState(useAppSelector(selectLevelState))
+  const [levelState, setLevelState] = useState<LevelStateData>(initialLevelState)
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
-  const [state, setState] = useState<SelectionSortState>(initialState.current)
-  const [pastStates, setPastStates] = useState<SelectionSortState[]>(initialState.previous)
-  const [futureStates, setFutureStates] = useState<SelectionSortState[]>(initialState.next)
+  const [state, setState] = useState<SelectionSortState>(initialLevelState.stateTimeline[initialLevelState.currentStateIndex])
   const [type, setType] = useState<string>(Action.Init)
   const [prompt, setPrompt] = useState<string>(Prompts.Init)
   const [completed, setCompleted] = useState<boolean>(false)
 
   // Handlers.
   function handleFindMax() {
+    // New variables.
     let max = 0
     for (let index = 0; index < state.b; index++) {
       if (state.array[index] > state.array[max])
         max = index
     }
+    const newState = createState(state.array, state.b - 1, max, state.b)
+    let newTimeline = levelState.stateTimeline.slice(0, levelState.currentStateIndex + 1)
+    newTimeline.push(newState)
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(createState(state.array, state.b - 1, max, state.b))
+    setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+    setState(newState)
     setType(Action.FindMax)
     setPrompt(Prompts.FindMax)
   }
 
   function handleSwapMax() {
-    let newArray = state.array.slice()
-    newArray[state.max] = state.array[state.b - 1]
-    newArray[state.b - 1] = state.array[state.max]
-    setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(createState(newArray, state.i, state.b - 1, state.b))
-    setType(Action.SwapMax)
-    setPrompt(Prompts.SwapMax)
+    if (state.max !== undefined) {
+      // New variables.
+      let newArray = state.array.slice()
+      newArray[state.max] = state.array[state.b - 1]
+      newArray[state.b - 1] = state.array[state.max]
+      const newState = createState(newArray, state.i, state.i, state.b)
+      let newTimeline = levelState.stateTimeline.slice(0, levelState.currentStateIndex + 1)
+      newTimeline.push(newState)
+      // Update states.
+      setPreState({ ...state })
+      setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+      setState(newState)
+      setType(Action.SwapMax)
+      setPrompt(Prompts.SwapMax)
+    }
   }
 
   function handleDecrementBResetMaxI() {
+    // New variables.
+    const newState = createState(state.array, 0, undefined, state.b - 1)
+    let newTimeline = levelState.stateTimeline.slice(0, levelState.currentStateIndex + 1)
+    newTimeline.push(newState)
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(createState(state.array, 0, 0, state.b - 1))
+    setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+    setState(newState)
     setType(Action.DecrementBResetMaxI)
     setPrompt(Prompts.DecrementBResetMaxI)
   }
 
   function handleDiveIntoLevelTwo() {
+    // Logs.
+    console.log("status when diving into one:", levelState)
+    // Store level data.
+    dispatch(storeLevelState(levelState))
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
     setState(state)
     setType(Action.DiveIntoLevelTwo)
     setPrompt(Prompts.DiveIntoLevelTwo)
-    dispatch(updateUserId(userId))
-    dispatch(updateRunId(runId))
-    dispatch(storeLevelStates({
-      level: levelNumber,
-      currentState: { ...state },
-      previousStates: pastStates.slice(),
-      nextStates: futureStates.slice(),
-    }))
-    dispatch(storeLevelStates({
-      level: levelNumber + 1,
-      currentState: { ...state },
-      previousStates: [],
-      nextStates: [],
-    }))
   }
 
   function handleUndo() {
-    let newPastStates = pastStates.slice()
-    newPastStates.pop()
+    // Update states.
     setPreState({ ...state })
-    setPastStates(newPastStates)
-    setFutureStates(handleFutureStateUpdate(futureStates, state))
-    setState(pastStates[pastStates.length - 1])
+    setState(levelState.stateTimeline[levelState.currentStateIndex - 1])
+    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex - 1))
     setType(Action.Undo)
     setPrompt(Prompts.Undo)
   }
 
   function handleRedo() {
-    let newFutureStates = futureStates.slice()
-    newFutureStates.shift()
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates(newFutureStates)
-    setState(futureStates[0])
+    setState(levelState.stateTimeline[levelState.currentStateIndex + 1])
+    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex + 1))
     setType(Action.Redo)
     setPrompt(Prompts.Redo)
   }
 
   function handleReset() {
+    // Update states.
     setPreState({ ...state })
-    setPastStates([])
-    setFutureStates([])
-    setState(createState(initialArray, 0, 0, initialArray.length))
+    setLevelState(initialLevelState)
+    setState(initialLevelState.stateTimeline[initialLevelState.currentStateIndex])
     setType(Action.Reset)
     setPrompt(Prompts.Reset)
   }
 
   function handleDone() {
+    // New variables.
+    const newLevelState = createLevelState(levelNumber, false, levelState.stateTimeline, levelState.currentStateIndex)
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(state)
+    setLevelState(newLevelState)
+    setState({ ...state })
     setType(Action.Exit)
     setPrompt(Prompts.Exit)
     setCompleted(true)
@@ -280,17 +357,20 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
+    console.log("level:", levelNumber, "userId:", userId, "runId:", runId)
+    console.log('status:', levelState)
     // Redirect to lower level upon clicking Dive In Find Max.
     if (type === Action.DiveIntoLevelTwo) {
-      router.push("/level-two")
+      router.replace("/level-two")
+    }
+    // Redirect upon completion.
+    else if (completed) {
+      dispatch(storeLevelState(levelState))
+      router.replace("/level-zero")
     }
     // Log run actions.
     else if (runId !== "") {
-      updateRun({}, runId, type, preState, state)
-    }
-    // Redirect upon completion.
-    if (completed) {
-      router.push("/level-zero")
+      updateRun({}, runId, levelNumber, type, preState, state)
     }
   }, [router, userId, runId, type, preState, state, completed])
 
@@ -355,7 +435,13 @@ export default function Experiment() {
                       <br /> */}
                       b = {state.b}
                     </div>
-                    <CreateArray array={state.array} selected={state.max} sorted={checkSorted()} currentBoundary={state.b} />
+                    <CreateArray
+                      array={state.array}
+                      selected={state.max}
+                      sorted={checkSorted()}
+                      currentBoundary={state.b}
+                      currentMax={state.max}
+                    />
                   </div>
                 </div>
                 {/* Buttons */}
@@ -374,7 +460,7 @@ export default function Experiment() {
                       disabled={state.b <= 0}
                       handler={() => handleSwapMax()}
                     >
-                      Swap Boundary and Max Elements
+                      Swap Fringe and Max Elements
                     </ActionButton>
                     <ActionButton
                       id="select-sort"
@@ -391,7 +477,7 @@ export default function Experiment() {
                       type="subset"
                       handler={() => handleDiveIntoLevelTwo()}
                     >
-                      Dive Into Find Max Element
+                      Enter Find Max Element
                     </ActionButton>
                     <ActionButton
                       id="select-sort-dive"
@@ -405,7 +491,7 @@ export default function Experiment() {
                     <ActionButton
                       id="undo"
                       type="secondary"
-                      disabled={pastStates.length === 0}
+                      disabled={levelState.currentStateIndex <= 0}
                       handler={() => handleUndo()}
                     >
                       Undo
@@ -413,7 +499,7 @@ export default function Experiment() {
                     <ActionButton
                       id="redo"
                       type="secondary"
-                      disabled={futureStates.length === 0}
+                      disabled={levelState.currentStateIndex >= (levelState.stateTimeline.length - 1)}
                       handler={() => handleRedo()}
                     >
                       Redo

@@ -27,7 +27,7 @@ function AgreeButton({ route }: { route: string }) {
     console.log("userId:", userId)
     if (userId !== "") {
       console.log("Redirecting to experiment.")
-      router.push(route)
+      router.replace(route)
     }
   }, [router, userId, route])
 
@@ -56,7 +56,7 @@ function AgreeButton({ route }: { route: string }) {
       // Update userId in the store for accessing across pages.
       setUserId(input)
       // Redirect to the experiment.
-      router.push('/experiment/heapify')
+      router.replace(route)
     }
     else {
       // Fetch the algorithmId.
@@ -89,7 +89,6 @@ function AgreeButton({ route }: { route: string }) {
     e: MouseEvent<HTMLButtonElement>,
     router: ReturnType<typeof useRouter>,
     client: AxiosInstance | null,
-    userId: string,
     setUserId: Function,
   ) => {
     // Logging for testing.
@@ -134,7 +133,7 @@ function AgreeButton({ route }: { route: string }) {
       id="agree"
       className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-4 m-1 rounded text-lg"
       // Read Roll Number, generate userID and call getAlgorithm function to fetch algorithmID.
-      onClick={(e) => onClickAgree(e, router, client, userId, handleUpdateUserId)}
+      onClick={(e) => onClickAgree(e, router, client, handleUpdateUserId)}
     >
       Agree
     </button>

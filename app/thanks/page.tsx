@@ -25,7 +25,7 @@ export default function Home() {
   function handleHome() {
     handleUpdateUserId("")
     handleUpdateRunId("")
-    router.push('/')
+    router.replace('/')
   }
 
   return (

@@ -1,5 +1,5 @@
 {
-  "name": "selection-sort",
+  "name": "selection-sort-hierarchical",
   "version": "0.1.0",
   "private": true,
   "scripts": {

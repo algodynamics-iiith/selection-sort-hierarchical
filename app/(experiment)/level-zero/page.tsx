@@ -9,8 +9,19 @@ import { Suspense, useEffect, useState } from "react"
 import API from "@/app/api"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
-import { selectTheme, selectUserId, SelectionSortState, updateUserId, storeLevelStates, updateRunId, selectLevelStates, selectInitialArray, selectRunId } from "@/lib/features/userData/userDataSlice"
+import {
+  selectTheme,
+  selectUserId,
+  SelectionSortState,
+  storeLevelState,
+  updateRunId,
+  selectLevelState,
+  selectRunId,
+  LevelStateData
+} from "@/lib/features/userData/userDataSlice"
 import Loading from "./loading"
+
+const levelNumber = 0
 
 // API Function Calls
 
@@ -18,8 +29,13 @@ import Loading from "./loading"
  * API call to create a run for a userId and set the runId.
  * @param userId The userId of the user.
  * @param setRunId Function to set the runId.
+ * @param dispatch Function to dispatch hook to store the runId in store.
  */
-const createRun = async (userId: string, setRunId: React.Dispatch<React.SetStateAction<string>>) => {
+const createRun = async (
+  userId: string,
+  setRunId: React.Dispatch<React.SetStateAction<string>>,
+  storeRunId: Function
+) => {
   console.log("Creating runId.")
   // If API Gateway is defined.
   if (API.getUri() !== undefined) {
@@ -32,21 +48,29 @@ const createRun = async (userId: string, setRunId: React.Dispatch<React.SetState
         })
       )
       .then((response: any) => {
-        // Set the runId.
+        // Set the runId for the page.
         setRunId(response.data.id)
+        // Store the runId in the redux store.
+        storeRunId(response.data.id)
       })
       .catch((error: any) => {
         console.log(error)
       })
   }
   // If testing.
-  else { setRunId("testRunID") }
+  else {
+    // Set the runId for the page.
+    setRunId("testRunID")
+    // Store the runId in the redux store.
+    storeRunId("testRunID")
+  }
 }
 
 /**
  * API call to update the Run parameters.
  * @param payload Payload for the API.
  * @param runId The runId of the current run.
+ * @param level The level number.
  * @param type The action performed.
  * @param preState The state before the action.
  * @param postState The state after the action.
@@ -54,6 +78,7 @@ const createRun = async (userId: string, setRunId: React.Dispatch<React.SetState
 const updateRun = async (
   payload: any,
   runId: string,
+  level: number,
   type: string,
   preState: SelectionSortState,
   postState: SelectionSortState
@@ -66,6 +91,7 @@ const updateRun = async (
   console.log(JSON.stringify({
     id: runId,
     payload: payload === undefined ? {} : payload,
+    level: level,
     type: type,
     preState: preState === undefined ? {} : preState,
     postState: postState === undefined ? {} : postState,
@@ -76,9 +102,11 @@ const updateRun = async (
     // API call.
     await API
       .post(
-        `/updateRun`, JSON.stringify({
+        `/updateRun`,
+        JSON.stringify({
           id: runId,
           payload: payload === undefined ? {} : payload,
+          level: level,
           type: type,
           preState: preState === undefined ? {} : preState,
           postState: postState === undefined ? {} : postState,
@@ -147,6 +175,25 @@ const Prompts = Object.freeze({
 })
 
 /**
+ * Function to create an instance of the level state.
+ * @param level Level number.
+ * @param status Boolean of whether the level is active or not.
+ * @param timeline Action timeline.
+ * @param stateIndex Index of timeline element indicating the current experiment state.
+ * @returns 
+ */
+function createLevelState(level: number, status: boolean, timeline: SelectionSortState[], stateIndex: number): LevelStateData {
+  let levelState: LevelStateData = {} as LevelStateData
+
+  levelState.level = level
+  levelState.activityStatus = status
+  levelState.stateTimeline = timeline
+  levelState.currentStateIndex = stateIndex
+
+  return levelState
+}
+
+/**
  * Function that creates an instance of a Selection Sort State.
  * @param array Array of numbers.
  * @param i Current index.
@@ -154,13 +201,14 @@ const Prompts = Object.freeze({
  * @param b Boundary index.
  * @returns SelectionSortState instance.
  */
-function createState(array: number[], i: number, max: number, b: number): SelectionSortState {
+function createState(array: number[], i: number, max: number | undefined, b: number): SelectionSortState {
   let state: SelectionSortState = {} as SelectionSortState
 
   state.array = array
   state.b = b
   state.i = i
   state.max = max
+  state.lowerlevel = {} as LevelStateData
 
   return state
 }
@@ -175,27 +223,73 @@ function createState(array: number[], i: number, max: number, b: number): Select
 // const prompt = "Experiment Initialised."
 
 /**
- * Function to update the array containing list of previous states.
- * @param pastStates Array with list of previous states.
- * @param state State to be added.
- * @returns Updated past states array.
+ * Function to initialise the Action timeline.
+ * @param levelState LevelStateData from redux store.
+ * @returns Timeline of Action history.
  */
-function handlePastStateUpdate(pastStates: SelectionSortState[], state: SelectionSortState) {
-  let newPastStateArray = pastStates.slice()
-  newPastStateArray.push({ ...state })
-  return newPastStateArray
-}
+function initLevelState(levelState: LevelStateData) {
+  let state = { ...levelState }
+  let level = levelNumber
 
-/**
- * Function to update the array containing list of future states.
- * @param futureStates Array with list of future states.
- * @param state State to be added.
- * @returns Updated future states array.
- */
-function handleFutureStateUpdate(futureStates: SelectionSortState[], state: SelectionSortState) {
-  let newFutureStateArray = futureStates.slice()
-  newFutureStateArray.unshift({ ...state })
-  return newFutureStateArray
+  while (level > 0) {
+    // If lower LevelStateData doesn't exist
+    if (Object.keys(state.stateTimeline[state.currentStateIndex].lowerlevel).length === 0) {
+      // Create lower level SelectionSortState data
+      const newState = createState(
+        state.stateTimeline[state.currentStateIndex].array,
+        state.stateTimeline[state.currentStateIndex].i,
+        state.stateTimeline[state.currentStateIndex].max,
+        state.stateTimeline[state.currentStateIndex].b
+      )
+
+      // Create and store lower LevelStateData
+      state = createLevelState(
+        levelState.level - state.level + 1,
+        true,
+        [newState],
+        0
+      )
+
+      // Return the state.
+      return state
+    }
+    // If lower LevelStateData exists
+    else {
+      // Update state to the lower state
+      state = state.stateTimeline[state.currentStateIndex].lowerlevel
+    }
+
+    // Decrement level counter
+    level -= 1
+  }
+
+  // If there was a modification of SelectionSortState in the lower level, 
+  // remove all actions after current state index
+  // and add the new state as the latest action.
+  if (Object.keys(state.stateTimeline[state.currentStateIndex].lowerlevel).length !== 0) {
+    const currentState = state.stateTimeline[state.currentStateIndex]
+    const lowerLevelState = state.stateTimeline[state.currentStateIndex].lowerlevel
+    let newState = { ...lowerLevelState.stateTimeline[lowerLevelState.currentStateIndex] }
+
+    // Check if lower state and current state values match. 
+    // If not, update the current timeline with the new state entry.
+    if ((currentState.b !== newState.b) || (currentState.i !== newState.i) || (currentState.max !== newState.max)) {
+      // New timeline.
+      let newTimeline = state.stateTimeline.slice(0, state.currentStateIndex + 1)
+      newTimeline.push(createState(
+        newState.array,
+        newState.i,
+        newState.max,
+        newState.b))
+
+      // New level state.
+      state = createLevelState(state.level, true, newTimeline, newTimeline.length - 1)
+    }
+  }
+
+  console.log("level:", levelNumber, "initLevelState:", state)
+
+  return state
 }
 
 /**
@@ -227,8 +321,6 @@ function performSelectionSort(array: number[]) {
   return newArray
 }
 
-const levelNumber = 0
-
 export default function Experiment() {
   // Router for navigation between pages.
   const router = useRouter()
@@ -237,95 +329,89 @@ export default function Experiment() {
   // Initialisation.
   const userId = useAppSelector(selectUserId)
   const theme = useAppSelector(selectTheme)
-  const initialArray = useAppSelector(selectInitialArray)
-  const initialState = useAppSelector(selectLevelStates)[levelNumber]
+  const initialLevelState = initLevelState(useAppSelector(selectLevelState))
+  const [levelState, setLevelState] = useState<LevelStateData>(initialLevelState)
   const [runId, setRunId] = useState<string>(useAppSelector(selectRunId))
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
-  const [state, setState] = useState<SelectionSortState>(initialState.current)
-  const [pastStates, setPastStates] = useState<SelectionSortState[]>(initialState.previous)
-  const [futureStates, setFutureStates] = useState<SelectionSortState[]>(initialState.next)
+  const [state, setState] = useState<SelectionSortState>(initialLevelState.stateTimeline[initialLevelState.currentStateIndex])
   const [type, setType] = useState<string>(Action.Init)
   const [prompt, setPrompt] = useState<string>(Prompts.Init)
   const [completed, setCompleted] = useState<boolean>(false)
 
+  // Function to handle updating runId.
+  function storeRunId(id: string) { dispatch(updateRunId(id)) }
+
   // Handlers.
   function handleSelectionSort() {
+    // New variables.
     const newArray = performSelectionSort(state.array)
+    const newState = createState(newArray, 0, 0, 0)
+    let newTimeline = levelState.stateTimeline.slice(0, levelState.currentStateIndex + 1)
+    newTimeline.push(newState)
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(createState(newArray, 0, 0, 0))
+    setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+    setState(newState)
     setType(Action.SelectionSort)
     setPrompt(Prompts.SelectionSort)
   }
 
   function handleDiveIntoLevelOne() {
+    // Logs.
+    console.log("status when diving into one:", levelState)
+    // Store level data.
+    dispatch(storeLevelState(levelState))
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(state)
+    setState({ ...state })
     setType(Action.DiveIntoLevelOne)
     setPrompt(Prompts.DiveIntoLevelOne)
-    dispatch(updateUserId(userId))
-    dispatch(updateRunId(runId))
-    dispatch(storeLevelStates({
-      level: levelNumber,
-      currentState: { ...state },
-      previousStates: pastStates.slice(),
-      nextStates: futureStates.slice(),
-    }))
-    dispatch(storeLevelStates({
-      level: levelNumber + 1,
-      currentState: { ...state },
-      previousStates: [],
-      nextStates: [],
-    }))
   }
 
   function handleUndo() {
-    let newPastStates = pastStates.slice()
-    newPastStates.pop()
+    // Update states.
     setPreState({ ...state })
-    setPastStates(newPastStates)
-    setFutureStates(handleFutureStateUpdate(futureStates, state))
-    setState(pastStates[pastStates.length - 1])
+    setState(levelState.stateTimeline[levelState.currentStateIndex - 1])
+    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex - 1))
     setType(Action.Undo)
     setPrompt(Prompts.Undo)
   }
 
   function handleRedo() {
-    let newFutureStates = futureStates.slice()
-    newFutureStates.shift()
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates(newFutureStates)
-    setState(futureStates[0])
+    setState(levelState.stateTimeline[levelState.currentStateIndex + 1])
+    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex + 1))
     setType(Action.Redo)
     setPrompt(Prompts.Redo)
   }
 
   function handleReset() {
+    // New variables.
+    let newLevelState = createLevelState(levelNumber, true, levelState.stateTimeline.slice(0, 1), 0)
+    // Update states.
     setPreState({ ...state })
-    setPastStates([])
-    setFutureStates([])
-    setState(createState(initialArray, 0, 0, initialArray.length))
+    setLevelState(newLevelState)
+    setState(newLevelState.stateTimeline[0])
     setType(Action.Reset)
     setPrompt(Prompts.Reset)
   }
 
   function handleSubmit() {
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
-    setState(state)
+    setLevelState({ ...levelState })
+    setState({ ...state })
     setType(Action.Submit)
     setPrompt(Prompts.Submit)
   }
 
   function handleConfirmSubmit() {
+    // New variables.
+    const newLevelState = createLevelState(levelNumber, false, levelState.stateTimeline, levelState.currentStateIndex)
+    // Update states.
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
+    setLevelState(newLevelState)
     setState({ ...state })
     setType(Action.ConfirmSubmit)
     setPrompt(Prompts.ConfirmSubmit)
@@ -334,8 +420,7 @@ export default function Experiment() {
 
   function handleCancelSubmit() {
     setPreState({ ...state })
-    setPastStates(handlePastStateUpdate(pastStates, state))
-    setFutureStates([])
+    setLevelState({ ...levelState })
     setState({ ...state })
     setType(Action.CancelSubmit)
     setPrompt(Prompts.CancelSubmit)
@@ -354,23 +439,28 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
-    console.log(userId)
-    // Generating Run ID
+    console.log("level:", levelNumber, "userId:", userId, "runId:", runId)
+    console.log('useEffect pre-status:', levelState)
+    // Generating Run ID upon initialisation.
     if (userId !== "" && runId === "") {
-      // console.log(userId)
-      createRun(userId, setRunId)
+      createRun(userId, setRunId, storeRunId)
     }
+    // // If level is not active, set its acitivity status as active.
+    // if (levelState.activityStatus === false) {
+    //   setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex))
+    // }
     // Redirect to lower level upon clicking Dive In.
     else if (type === Action.DiveIntoLevelOne) {
-      router.push("/level-one")
+      router.replace("/level-one")
+    }
+    // Redirect upon completion.
+    else if (completed) {
+      dispatch(storeLevelState(levelState))
+      router.replace("/thanks")
     }
     // Log run actions.
     else if (runId !== "") {
-      updateRun({}, runId, type, preState, state)
-    }
-    // Redirect upon completion.
-    if (completed) {
-      router.push("/thanks")
+      updateRun({}, runId, levelNumber, type, preState, state)
     }
   }, [router, userId, runId, type, preState, state, completed])
 
@@ -462,7 +552,11 @@ export default function Experiment() {
                     <br />
                     b = {state.b}
                   </div> */}
-                  <CreateArray array={state.array} sorted={checkSorted()} hideIndex />
+                  <CreateArray
+                    array={state.array}
+                    sorted={checkSorted()}
+                    hideIndex
+                  />
                 </div>
                 {/* Buttons */}
                 <div className="flex flex-col items-center space-y-2 p-2">
@@ -471,20 +565,20 @@ export default function Experiment() {
                     type="primary"
                     handler={() => handleSelectionSort()}
                   >
-                    Perform Selection Sort
+                    Apply Selection Sort
                   </ActionButton>
                   <ActionButton
                     id="select-sort-dive"
                     type="subset"
                     handler={() => handleDiveIntoLevelOne()}
                   >
-                    Dive Into Selection Sort
+                    Enter Selection Sort
                   </ActionButton>
                   <div className="flex justify-between">
                     <ActionButton
                       id="undo"
                       type="secondary"
-                      disabled={pastStates.length === 0}
+                      disabled={levelState.currentStateIndex <= 0}
                       handler={() => handleUndo()}
                     >
                       Undo
@@ -492,7 +586,7 @@ export default function Experiment() {
                     <ActionButton
                       id="redo"
                       type="secondary"
-                      disabled={futureStates.length === 0}
+                      disabled={levelState.currentStateIndex >= (levelState.stateTimeline.length - 1)}
                       handler={() => handleRedo()}
                     >
                       Redo
