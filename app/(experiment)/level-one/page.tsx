@@ -268,7 +268,7 @@ export default function Experiment() {
       let newArray = state.array.slice()
       newArray[state.max] = state.array[state.b - 1]
       newArray[state.b - 1] = state.array[state.max]
-      const newState = createState(newArray, state.i, state.i, state.b)
+      const newState = createState(newArray, state.i, state.b - 1, state.b)
       let newTimeline = levelState.stateTimeline.slice(0, levelState.currentStateIndex + 1)
       newTimeline.push(newState)
       // Update states.
@@ -324,10 +324,14 @@ export default function Experiment() {
   }
 
   function handleReset() {
+    // New variables.
+    let initState = initialLevelState.stateTimeline[0]
+    let newTimeline = [createState(initState.array, initState.i, initState.max, initState.b)]
+    let newLevelState = createLevelState(levelNumber, true, newTimeline, 0)
     // Update states.
     setPreState({ ...state })
-    setLevelState(initialLevelState)
-    setState(initialLevelState.stateTimeline[initialLevelState.currentStateIndex])
+    setLevelState(newLevelState)
+    setState(newLevelState.stateTimeline[0])
     setType(Action.Reset)
     setPrompt(Prompts.Reset)
   }
@@ -357,20 +361,23 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
-    console.log("level:", levelNumber, "userId:", userId, "runId:", runId)
-    console.log('status:', levelState)
+    console.log(
+      "userId:", userId,
+      "runId:", runId,
+      "status:", levelState
+    )
     // Redirect to lower level upon clicking Dive In Find Max.
     if (type === Action.DiveIntoLevelTwo) {
       router.replace("/level-two")
     }
-    // Redirect upon completion.
-    else if (completed) {
-      dispatch(storeLevelState(levelState))
-      router.replace("/level-zero")
-    }
     // Log run actions.
     else if (runId !== "") {
       updateRun({}, runId, levelNumber, type, preState, state)
+    }
+    // Redirect upon completion.
+    if (completed) {
+      dispatch(storeLevelState(levelState))
+      router.replace("/level-zero")
     }
   }, [router, userId, runId, type, preState, state, completed])
 
@@ -386,18 +393,6 @@ export default function Experiment() {
         </span>
         <div className='col-span-1 flex justify-around items-center'>
           <ThemeToggle />
-          <Suspense fallback={null}>
-            {/* Done Button */}
-            {/* <button
-              type='button'
-              className='transition ease-out hover:scale-110 hover:duration-400
-                px-2 py-1 border-2 border-white/75 hover:border-white hover:bg-slate-50/10 rounded-full
-                text-xl font-semibold text-slate-50'
-              onClick={() => handleDone()}
-            >
-              Done
-            </button> */}
-          </Suspense>
         </div>
       </header>
       {/* Experiment */}
@@ -414,13 +409,11 @@ export default function Experiment() {
               <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
                 {/* Prompt */}
                 <div className="w-full">
-                  <div
-                    className={"text-center m-4 p-2 rounded-md border-2 text-black "
-                      + ((prompt === Prompts.FindMax || prompt === Prompts.SwapMax)
-                        ? "bg-green-300 border-green-400"
-                        : "bg-blue-300 border-blue-400"
-                      )
-                    }
+                  <div className={
+                    "text-center m-4 p-2 rounded-md border-2 text-black "
+                    + ((prompt === Prompts.FindMax || prompt === Prompts.SwapMax)
+                      ? "bg-green-300 border-green-400"
+                      : "bg-blue-300 border-blue-400")}
                   >
                     {prompt}
                   </div>
@@ -438,7 +431,7 @@ export default function Experiment() {
                     <CreateArray
                       array={state.array}
                       selected={state.max}
-                      sorted={checkSorted()}
+                      sorted={(state.b <= 1 && checkSorted()) ? true : state.b}
                       currentBoundary={state.b}
                       currentMax={state.max}
                     />
@@ -519,7 +512,9 @@ export default function Experiment() {
         </div>
       </Suspense>
       {/* Copyright */}
-      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>Copyright &copy; 2023 Algodynamics.</div>
+      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
+        Copyright &copy; 2023 Algodynamics.
+      </div>
     </Layout>
   )
 }

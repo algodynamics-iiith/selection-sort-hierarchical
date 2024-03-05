@@ -34,6 +34,14 @@ export default function Information() {
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>n</td>
             </tr>
           </tbody>
+          <tbody>
+            <tr>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>f (Fringe)</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>b - 1, null</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>b - 1, null</td>
+            </tr>
+          </tbody>
         </table>
         <p>where n is the length of the array.</p>
       </div>

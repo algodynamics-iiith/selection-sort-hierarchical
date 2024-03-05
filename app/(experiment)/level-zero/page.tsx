@@ -388,7 +388,9 @@ export default function Experiment() {
 
   function handleReset() {
     // New variables.
-    let newLevelState = createLevelState(levelNumber, true, levelState.stateTimeline.slice(0, 1), 0)
+    let initState = initialLevelState.stateTimeline[0]
+    let newTimeline = [createState(initState.array, initState.i, initState.max, initState.b)]
+    let newLevelState = createLevelState(levelNumber, true, newTimeline, 0)
     // Update states.
     setPreState({ ...state })
     setLevelState(newLevelState)
@@ -439,28 +441,27 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
-    console.log("level:", levelNumber, "userId:", userId, "runId:", runId)
-    console.log('useEffect pre-status:', levelState)
+    console.log(
+      "userId:", userId,
+      "runId:", runId,
+      "status:", levelState
+    )
     // Generating Run ID upon initialisation.
     if (userId !== "" && runId === "") {
       createRun(userId, setRunId, storeRunId)
     }
-    // // If level is not active, set its acitivity status as active.
-    // if (levelState.activityStatus === false) {
-    //   setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex))
-    // }
     // Redirect to lower level upon clicking Dive In.
     else if (type === Action.DiveIntoLevelOne) {
       router.replace("/level-one")
     }
-    // Redirect upon completion.
-    else if (completed) {
-      dispatch(storeLevelState(levelState))
-      router.replace("/thanks")
-    }
     // Log run actions.
     else if (runId !== "") {
       updateRun({}, runId, levelNumber, type, preState, state)
+    }
+    // Redirect upon completion.
+    if (completed) {
+      dispatch(storeLevelState(levelState))
+      router.replace("/thanks")
     }
   }, [router, userId, runId, type, preState, state, completed])
 
@@ -501,13 +502,13 @@ export default function Experiment() {
           <div className="w-full text-lg overflow-x-auto">
             <div className="relative h-full w-full">
               {/* Submit Window */}
-              <div
-                className={"absolute z-10 justify-center items-center align-middle flex flex-col w-full h-full "
-                  + (type == Action.Submit ? "backdrop-blur-md" : "hidden")}
+              <div className={
+                "absolute z-10 justify-center items-center align-middle flex flex-col w-full h-full "
+                + (type == Action.Submit ? "backdrop-blur-md" : "hidden")}
               >
-                <div
-                  className={"flex flex-col justify-center items-center align-middle text-lg w-1/3 h-1/3 shadow-lg p-2 rounded-md "
-                    + (theme === "Light" ? "bg-gray-50 text-gray-900 border-black" : "bg-gray-900 text-gray-100 border-gray-100")}
+                <div className={
+                  "flex flex-col justify-center items-center align-middle text-lg w-1/3 h-1/3 shadow-lg p-2 rounded-md "
+                  + (theme === "Light" ? "bg-gray-50 text-gray-900 border-black" : "bg-gray-900 text-gray-100 border-gray-100")}
                 >
                   <span className="flex text-center">Comfirm Submission?</span>
                   <div className="flex flex-row justify-between p-2">
@@ -532,13 +533,11 @@ export default function Experiment() {
               <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
                 {/* Prompt */}
                 <div className="w-full">
-                  <div
-                    className={"text-center m-4 p-2 rounded-md border-2 text-black "
-                      + ((prompt === Prompts.SelectionSort || prompt === Prompts.ConfirmSubmit)
-                        ? "bg-green-300 border-green-400"
-                        : "bg-blue-300 border-blue-400"
-                      )
-                    }
+                  <div className={
+                    "text-center m-4 p-2 rounded-md border-2 text-black "
+                    + ((prompt === Prompts.SelectionSort || prompt === Prompts.ConfirmSubmit)
+                      ? "bg-green-300 border-green-400"
+                      : "bg-blue-300 border-blue-400")}
                   >
                     {prompt}
                   </div>
@@ -554,7 +553,7 @@ export default function Experiment() {
                   </div> */}
                   <CreateArray
                     array={state.array}
-                    sorted={checkSorted()}
+                    sorted={(state.b <= 1 && checkSorted()) ? true : state.b}
                     hideIndex
                   />
                 </div>
@@ -606,7 +605,9 @@ export default function Experiment() {
         </div>
       </Suspense>
       {/* Copyright */}
-      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>Copyright &copy; 2023 Algodynamics.</div>
+      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
+        Copyright &copy; 2023 Algodynamics.
+      </div>
     </Layout>
   )
 }

@@ -293,10 +293,14 @@ export default function Experiment() {
   }
 
   function handleReset() {
+    // New variables.
+    let initState = initialLevelState.stateTimeline[0]
+    let newTimeline = [createState(initState.array, initState.i, initState.max, initState.b)]
+    let newLevelState = createLevelState(levelNumber, true, newTimeline, 0)
     // Update states.
     setPreState({ ...state })
-    setLevelState(initialLevelState)
-    setState(initialLevelState.stateTimeline[initialLevelState.currentStateIndex])
+    setLevelState(newLevelState)
+    setState(newLevelState.stateTimeline[0])
     setType(Action.Reset)
     setPrompt(Prompts.Reset)
   }
@@ -326,16 +330,19 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
-    console.log("level:", levelNumber, "userId:", userId, "runId:", runId)
-    console.log('status:', levelState)
+    console.log(
+      "userId:", userId,
+      "runId:", runId,
+      "status:", levelState
+    )
+    // Log run actions.
+    if (runId !== "") {
+      updateRun({}, runId, levelNumber, type, preState, state)
+    }
     // Redirect upon completion.
     if (completed) {
       dispatch(storeLevelState(levelState))
       router.replace("/level-one")
-    }
-    // Log run actions.
-    if (runId !== "") {
-      updateRun({}, runId, levelNumber, type, preState, state)
     }
   }, [router, userId, runId, type, preState, state, completed])
 
@@ -367,15 +374,13 @@ export default function Experiment() {
               <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
                 {/* Prompt */}
                 <div className="w-full">
-                  <div
-                    className={"text-center m-4 p-2 rounded-md border-2 text-black "
-                      + ((prompt === Prompts.DecrementAndResetFail || prompt === Prompts.IncrementFail)
-                        ? "bg-red-300 border-red-400"
-                        : (prompt === Prompts.DecrementAndReset || prompt === Prompts.Increment || prompt === Prompts.SwapMax || prompt === Prompts.UpdateMax)
-                          ? "bg-green-300 border-green-400"
-                          : "bg-blue-300 border-blue-400"
-                      )
-                    }
+                  <div className={
+                    "text-center m-4 p-2 rounded-md border-2 text-black "
+                    + ((prompt === Prompts.DecrementAndResetFail || prompt === Prompts.IncrementFail)
+                      ? "bg-red-300 border-red-400"
+                      : (prompt === Prompts.DecrementAndReset || prompt === Prompts.Increment || prompt === Prompts.SwapMax || prompt === Prompts.UpdateMax)
+                        ? "bg-green-300 border-green-400"
+                        : "bg-blue-300 border-blue-400")}
                   >
                     {prompt}
                   </div>
@@ -393,7 +398,7 @@ export default function Experiment() {
                     <CreateArray
                       array={state.array}
                       selected={state.max}
-                      sorted={checkSorted()}
+                      sorted={(state.b <= 1 && checkSorted()) ? true : state.b}
                       currentIndex={state.i}
                       currentBoundary={state.b}
                       currentMax={state.max}
@@ -460,7 +465,9 @@ export default function Experiment() {
         </div>
       </Suspense>
       {/* Copyright */}
-      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>Copyright &copy; 2023 Algodynamics.</div>
+      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
+        Copyright &copy; 2023 Algodynamics.
+      </div>
     </Layout>
   )
 }

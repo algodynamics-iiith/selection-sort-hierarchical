@@ -4,6 +4,7 @@ export default function CreateArray({
   array,
   selected,
   sorted,
+  descending,
   hideIndex,
   currentIndex,
   currentBoundary,
@@ -12,13 +13,25 @@ export default function CreateArray({
 }: {
   array: number[],
   selected?: number,
-  sorted?: boolean,
+  sorted?: boolean | number,
+  descending?: boolean,
   hideIndex?: boolean,
   currentIndex?: number,
   currentBoundary?: number,
   currentMax?: number,
   currentMin?: number,
 }) {
+  function checkBoundarySorted(array: number[], boundary: number, descending?: boolean) {
+    let index = boundary
+    while ((index + 1) < array.length) {
+      if (descending && (array[index] < array[index + 1])) { return false }
+      else if (array[index] > array[index + 1]) { return false }
+
+      index += 1
+    }
+    return true
+  }
+
   return (
     <div className="flex w-full justify-evenly items-start">
       {/* Value Names */}
@@ -29,7 +42,16 @@ export default function CreateArray({
       {/* Array Elements */}
       {array.map((value, index) => {
         return (<div className="flex flex-col justify-start items-center space-y-2" key={index}>
-          <ArrayElement value={value} index={index} highlight={index === selected} sorted={sorted} />
+          <ArrayElement
+            value={value}
+            index={index}
+            highlight={index === selected}
+            sorted={
+              (typeof sorted === "number")
+                ? ((index >= sorted) && checkBoundarySorted(array, sorted, descending))
+                : sorted
+            }
+          />
           <span className="text-amber-600 text-2xl" hidden={hideIndex}>{index}</span>
           <span className="text-amber-600 text-2xl" hidden={currentIndex === index ? false : true}>i</span>
           <span className="text-purple-600 text-2xl" hidden={currentBoundary === index ? false : true}>b</span>

@@ -38,8 +38,8 @@ export default function Information() {
             <tr>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>max</td>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n)</td>
-              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>0</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n), null</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>null</td>
             </tr>
           </tbody>
           <tbody>
@@ -48,6 +48,14 @@ export default function Information() {
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n]</td>
               <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>[0,n]</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>f (Fringe)</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>int</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>b - 1, null</td>
+              <td className={"border-2 " + (theme === "Light" ? "border-black" : "border-white")}>b - 1, null</td>
             </tr>
           </tbody>
         </table>
