@@ -391,7 +391,7 @@ export default function Experiment() {
                     <div className="flex flex-col justify-center items-center text-center w-1/6 h-full p-1 text-xl">
                       i = {state.i}
                       <br />
-                      max = {state.max}
+                      max = {state.max !== undefined ? state.max : "null"}
                       <br />
                       b = {state.b}
                     </div>
