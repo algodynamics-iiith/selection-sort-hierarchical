@@ -409,7 +409,7 @@ export default function Experiment() {
                 <div className="flex flex-col items-center space-y-2 p-2">
                   <div className="flex justify-between">
                     <ActionButton
-                      id="inc"
+                      id="inc-i"
                       type="primary"
                       disabled={state.i >= state.array.length - 1}
                       handler={() => handleIncrementI()}
@@ -417,7 +417,7 @@ export default function Experiment() {
                       Increment i
                     </ActionButton>
                     <ActionButton
-                      id="update"
+                      id="update-max"
                       type="primary"
                       handler={() => handleUpdateMax()}
                     >
@@ -426,7 +426,7 @@ export default function Experiment() {
                   </div>
                   <div className="flex justify-between">
                     <ActionButton
-                      id="select-sort-dive"
+                      id="exit-level-two"
                       type="subset"
                       handler={() => handleDone()}
                     >

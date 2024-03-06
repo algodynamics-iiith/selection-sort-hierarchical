@@ -1,5 +1,6 @@
 import ArrayElement from "@/app/_components/_buttons/arrayElements"
 
+// Function to generate the array.
 export default function CreateArray({
   array,
   selected,
@@ -42,6 +43,7 @@ export default function CreateArray({
       {/* Array Elements */}
       {array.map((value, index) => {
         return (<div className="flex flex-col justify-start items-center space-y-2" key={index}>
+          {/* Element */}
           <ArrayElement
             value={value}
             index={index}
@@ -52,15 +54,33 @@ export default function CreateArray({
                 : sorted
             }
           />
-          <span className="text-amber-600 text-2xl" hidden={hideIndex}>{index}</span>
-          <span className="text-amber-600 text-2xl" hidden={currentIndex === index ? false : true}>i</span>
-          <span className="text-purple-600 text-2xl" hidden={currentBoundary === index ? false : true}>b</span>
-          <span className="text-purple-600 text-2xl" hidden={(currentBoundary && ((currentBoundary - 1) === index)) ? false : true}>f</span>
-          <span className="text-purple-600 text-2xl" hidden={currentMax === index ? false : true}>max</span>
-          <span className="text-purple-600 text-2xl" hidden={currentMin === index ? false : true}>min</span>
+          {/* Position/Index */}
+          <span className="text-amber-600 text-2xl" hidden={hideIndex}>
+            {index}
+          </span>
+          {/* Index Pointer */}
+          <span className="text-amber-600 text-2xl" hidden={currentIndex === index ? false : true}>
+            i
+          </span>
+          {/* Boundary Pointer */}
+          <span className="text-purple-600 text-2xl" hidden={currentBoundary === index ? false : true}>
+            b
+          </span>
+          {/* Fringe Pointer */}
+          <span className="text-purple-600 text-2xl" hidden={(currentBoundary && ((currentBoundary - 1) === index)) ? false : true}>
+            f
+          </span>
+          {/* Max Pointer */}
+          <span className="text-purple-600 text-2xl" hidden={currentMax === index ? false : true}>
+            max
+          </span>
+          {/* Min Pointer */}
+          <span className="text-purple-600 text-2xl" hidden={currentMin === index ? false : true}>
+            min
+          </span>
         </div>)
       })}
-      {/* Boundary */}
+      {/* Boundary Element */}
       {(hideIndex !== true) && <div className="flex flex-col justify-start items-center space-y-2">
         <div className="flex justify-center mt-1 px-5 py-7 text-2xl rounded-lg">{`${' '}`}</div>
         <span className="text-amber-600 text-2xl" hidden={hideIndex}>{array.length}</span>

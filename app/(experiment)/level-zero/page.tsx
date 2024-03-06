@@ -567,7 +567,7 @@ export default function Experiment() {
                     Apply Selection Sort
                   </ActionButton>
                   <ActionButton
-                    id="select-sort-dive"
+                    id="dive-level-one"
                     type="subset"
                     handler={() => handleDiveIntoLevelOne()}
                   >

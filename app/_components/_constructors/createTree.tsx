@@ -18,27 +18,35 @@ interface ParentChildPair {
 /**
  * Function to create a JSON tree from an array containing the heap elements.
  * @param array Array of heap elements.
- * @param index Index of array element.
+ * @param i Index of array element.
  * @returns JSON tree containing the heap.
  */
 function createTreeData(array: number[], i: number) {
   let heapTree = {} as TreeNodeData
+  // If specified array index exceeds array length.
   if (i >= array.length)
     return heapTree
+  // Add the array element.
   else
     heapTree.name = array[i].toString()
 
+  // If left child exists.
   if ((2 * i) + 1 < array.length) {
+    // If array containing children data is not initialised.
     if (heapTree.children === undefined) {
       heapTree.children = []
     }
+    // Add left child.
     heapTree.children.push(createTreeData(array, 2 * i + 1))
   }
 
+  // If right child exists.
   if ((2 * i) + 2 < array.length) {
+    // If array containing children data is not initialised.
     if (heapTree.children === undefined) {
       heapTree.children = []
     }
+    // Add right child.
     heapTree.children.push(createTreeData(array, 2 * i + 2))
   }
 
@@ -50,22 +58,25 @@ function createTreeData(array: number[], i: number) {
  * @param treeData JSON object containing the data of the tree nodes.
  * @param index Index of the current node.
  * @param selected Index that is selected.
+ * @param count Number of tree elements.
  * @returns HTML div containing the tree nodes.
  */
 function createTreeElements(treeData: TreeNodeData, index: number, selected: number | null, count: number) {
   // Create Tree Elements.
-  return (<div className='flex flex-col justify-center items-center space-y-10' id={`parent-${index}-${count}`} >
-    {/* Parent Node */}
-    <TreeElement value={treeData.name} index={index} id={`node-${index}-${count}`} highlight={index === selected} />
-    {/* Child Nodes Container */}
-    {treeData.children !== undefined &&
-      (<div className='flex flex-row justify-between items-center space-x-20' id={`children-${index}-${count}`} >
-        {treeData.children.map((value, i) => {
-          // Child Node
-          return (createTreeElements(value, 2 * index + i + 1, selected, count))
-        })}
-      </div>)}
-  </div>)
+  return (
+    <div className='flex flex-col justify-center items-center space-y-10' id={`parent-${index}-${count}`} >
+      {/* Parent Node */}
+      <TreeElement value={treeData.name} index={index} id={`node-${index}-${count}`} highlight={index === selected} />
+      {/* Child Nodes Container */}
+      {treeData.children !== undefined &&
+        (<div className='flex flex-row justify-between items-center space-x-20' id={`children-${index}-${count}`} >
+          {treeData.children.map((value, i) => {
+            // Child Node
+            return (createTreeElements(value, 2 * index + i + 1, selected, count))
+          })}
+        </div>)}
+    </div>
+  )
 }
 
 /**

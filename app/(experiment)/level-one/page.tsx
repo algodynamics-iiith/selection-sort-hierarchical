@@ -441,22 +441,22 @@ export default function Experiment() {
                 <div className="flex flex-col items-center space-y-2 p-2">
                   <div className="flex justify-between">
                     <ActionButton
-                      id="select-sort"
+                      id="find-max"
                       type="primary"
                       handler={() => handleFindMax()}
                     >
                       Find Max Element
                     </ActionButton>
                     <ActionButton
-                      id="select-sort"
+                      id="swap-max-fringe"
                       type="primary"
-                      disabled={state.b <= 0}
+                      disabled={(state.b <= 0) || (typeof state.max !== "number")}
                       handler={() => handleSwapMax()}
                     >
                       Swap Fringe and Max Elements
                     </ActionButton>
                     <ActionButton
-                      id="select-sort"
+                      id="dec-boundary"
                       type="primary"
                       disabled={state.b <= 0}
                       handler={() => handleDecrementBResetMaxI()}
@@ -466,14 +466,14 @@ export default function Experiment() {
                   </div>
                   <div className="flex justify-between">
                     <ActionButton
-                      id="select-sort-dive"
+                      id="dive-level-two"
                       type="subset"
                       handler={() => handleDiveIntoLevelTwo()}
                     >
                       Enter Find Max Element
                     </ActionButton>
                     <ActionButton
-                      id="select-sort-dive"
+                      id="exit-level-one"
                       type="subset"
                       handler={() => handleDone()}
                     >
