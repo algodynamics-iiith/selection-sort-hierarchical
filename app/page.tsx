@@ -28,7 +28,7 @@ export default function Home() {
         </div>
       </header>
       <div className="flex flex-grow justify-center items-start overflow-y-auto">
-        <div className="container flex-grow flex flex-col justify-evenly p-10 px-24">
+        <div className="container flex-grow flex flex-col justify-evenly p-12 lg:px-24">
           <h1 className="text-2xl">Consent Form </h1>
           <h2 className="text-xl">Purpose of the Research</h2>
           <p className="py-3">

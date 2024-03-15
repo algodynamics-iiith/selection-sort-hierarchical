@@ -474,7 +474,7 @@ export default function Experiment() {
         <span className={"flex px-4 font-sans text-xl md:text-2xl font-bold text-slate-50 col-span-2 lg:col-span-3 justify-self-start items-center"}>
           Driving Test - Selection Sort - Level Zero
         </span>
-        <div className='col-span-2 lg:col-span-1 flex justify-around items-center'>
+        <div className='col-span-2 lg:col-span-1 flex justify-end lg:justify-around items-center'>
           <ThemeToggle />
           <Suspense fallback={null}>
             {/* Submit Button */}
@@ -498,8 +498,8 @@ export default function Experiment() {
             <Instructions />
           </div>
           {/* Activity */}
-          <div className="w-full text-md lg:text-2xl overflow-x-auto">
-            <div className="relative h-full w-full">
+          <div className="w-full text-md lg:text-2xl overflow-auto">
+            <div className="flex relative min-h-full w-full">
               {/* Submit Window */}
               <div className={
                 "absolute z-10 justify-center items-center align-middle flex flex-col w-full h-full "
@@ -529,11 +529,11 @@ export default function Experiment() {
                 </div>
               </div>
               {/* Controls */}
-              <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
+              <div className={"flex flex-col min-h-0 min-w-0 flex-grow justify-evenly items-center overflow-auto"}>
                 {/* Prompt */}
                 <div className="w-full">
                   <div className={
-                    "text-center m-4 p-1 lg:p-2 rounded-md border-2 text-black lg:text-xl "
+                    "flex justify-center text-center m-4 p-1 lg:p-2 rounded-md border-2 text-black lg:text-xl "
                     + ((prompt === Prompts.SelectionSort || prompt === Prompts.ConfirmSubmit)
                       ? "bg-green-300 border-green-400"
                       : "bg-blue-300 border-blue-400")}

@@ -389,7 +389,7 @@ export default function Experiment() {
       <span className={"flex px-4 font-sans text-xl md:text-2xl font-bold text-slate-50 col-span-2 lg:col-span-3 justify-self-start items-center"}>
           Driving Test - Selection Sort - Level One
         </span>
-        <div className='col-span-2 lg:col-span-1 flex justify-around items-center'>
+        <div className='col-span-2 lg:col-span-1 flex justify-end lg:justify-around items-center'>
           <ThemeToggle />
         </div>
       </header>
@@ -397,18 +397,18 @@ export default function Experiment() {
       <Suspense fallback={<Loading />}>
         <div className="flex-grow flex overflow-hidden">
           {/* Information */}
-          <div className="max-w-min md:max-w-min lg:max-w-2xl overflow-y-auto shadow-md p-4 lg:p-8 text-md lg:text-xl">
+          <div className="max-w-min lg:max-w-2xl overflow-y-auto shadow-md p-4 lg:p-8 text-md lg:text-xl">
             <Instructions />
           </div>
           {/* Activity */}
           <div className="w-full text-md lg:text-2xl overflow-auto">
-            <div className="relative h-full w-full">
+            <div className="flex relative min-h-full w-full">
               {/* Controls */}
-              <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
+              <div className={"flex flex-col min-h-0 min-w-0 flex-grow justify-evenly items-center overflow-auto"}>
                 {/* Prompt */}
                 <div className="w-full">
                   <div className={
-                    "text-center lg:m-4 p-1 lg:p-2 rounded-md border-2 text-black "
+                    "text-center m-4 p-1 lg:p-2 rounded-md border-2 text-black lg:text-xl "
                     + ((prompt === Prompts.FindMax || prompt === Prompts.SwapMax)
                       ? "bg-green-300 border-green-400"
                       : "bg-blue-300 border-blue-400")}
@@ -417,8 +417,8 @@ export default function Experiment() {
                   </div>
                 </div>
                 {/* Variables */}
-                <div className="grid grid-cols-1 grid-rows-3 w-full items-center justify-center h-1/2">
-                  <div className="flex w-full h-full row-start-2 justify-start items-start overflow-visible">
+                <div className="grid grid-cols-1 grid-rows-1 w-full items-center justify-center h-1/2">
+                  <div className="flex w-full h-full justify-start items-center overflow-visible">
                     <div className="flex flex-col justify-center items-center text-center w-1/6 h-full lg:p-1 text-md lg:text-2xl">
                       {/* i = {state.i}
                       <br />

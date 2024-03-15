@@ -351,10 +351,10 @@ export default function Experiment() {
         id='headerBlock'
         className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-blue-600 from-25% to-sky-600  shadow-lg'}
       >
-        <span className={"px-4 font-sans text-2xl font-bold text-slate-50 col-span-3 justify-self-start"}>
+        <span className={"flex px-4 font-sans text-xl md:text-2xl font-bold text-slate-50 col-span-2 lg:col-span-3 justify-self-start items-center"}>
           Driving Test - Selection Sort - Level Two
         </span>
-        <div className='col-span-1 flex justify-around items-center'>
+        <div className='col-span-2 lg:col-span-1 flex justify-end lg:justify-around items-center'>
           <ThemeToggle />
         </div>
       </header>
@@ -362,18 +362,18 @@ export default function Experiment() {
       <Suspense fallback={<Loading />}>
         <div className="flex-grow flex overflow-hidden">
           {/* Information */}
-          <div className="max-w-lg overflow-y-auto shadow-md p-6 text-lg">
+          <div className="max-w-min lg:max-w-2xl overflow-y-auto shadow-md p-4 lg:p-8 text-md lg:text-xl">
             <Instructions />
           </div>
           {/* Activity */}
-          <div className="w-full text-lg overflow-x-auto">
-            <div className="relative h-full w-full">
+          <div className="w-full text-md lg:text-2xl overflow-x-auto">
+            <div className="flex relative h-full w-full">
               {/* Controls */}
-              <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
+              <div className={"flex flex-col min-h-0 min-w-0 flex-grow justify-evenly items-center overflow-auto"}>
                 {/* Prompt */}
                 <div className="w-full">
                   <div className={
-                    "text-center m-4 p-2 rounded-md border-2 text-black "
+                    "text-center m-4 p-1 lg:p-2 rounded-md border-2 text-black lg:text-xl "
                     + ((prompt === Prompts.DecrementAndResetFail || prompt === Prompts.IncrementFail)
                       ? "bg-red-300 border-red-400"
                       : (prompt === Prompts.DecrementAndReset || prompt === Prompts.Increment || prompt === Prompts.SwapMax || prompt === Prompts.UpdateMax)
@@ -384,8 +384,8 @@ export default function Experiment() {
                   </div>
                 </div>
                 {/* Variables */}
-                <div className="grid grid-cols-1 grid-rows-3 w-full items-center justify-center h-1/2">
-                  <div className="flex w-full h-full row-start-2 justify-start items-start overflow-visible">
+                <div className="grid grid-cols-1 grid-rows-1 w-full items-center justify-center h-1/2">
+                  <div className="flex w-full h-full justify-start items-center overflow-visible">
                     <div className="flex flex-col justify-center items-center text-center w-1/6 h-full p-1 text-xl">
                       i = {state.i}
                       <br />
@@ -463,7 +463,7 @@ export default function Experiment() {
         </div>
       </Suspense>
       {/* Copyright */}
-      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
+      <div className={"text-center lg:text-xl p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
         Copyright &copy; 2023 Algodynamics.
       </div>
     </Layout>

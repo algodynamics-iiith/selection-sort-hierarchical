@@ -5,7 +5,7 @@ export default function Information() {
   const theme = useAppSelector(selectTheme)
   return (
     <div className="flex-col space-y-4">
-      <h1 className="text-center font-bold text-lg">Objective</h1>
+      <h1 className="text-center font-bold">Objective</h1>
       <p>
         Find the max element between indexes 0 and b - 1 (both inclusive) in the given array using the provided controls.
         <br />
@@ -16,7 +16,7 @@ export default function Information() {
         <li>Finding the max element is the secondary objective; The primary objective is the correct application of find max function as followed in the selection sort algorithm.</li>
       </ol>
       <div className="text-center m-1 flex-col justify-center space-y-2">
-        <h1 className="font-bold text-lg">Variables Description</h1>
+        <h1 className="font-bold">Variables Description</h1>
         <table className="w-full" id="variables-table">
           <thead>
             <tr>
@@ -62,7 +62,7 @@ export default function Information() {
         <p>where n is the length of the array.</p>
       </div>
       <div className="text-center m-1 flex-col justify-center space-y-2">
-        <h1 className="font-bold text-lg">Controls Description</h1>
+        <h1 className="font-bold">Controls Description</h1>
         <table className="w-full" id="variables-table">
           <thead>
             <tr>
@@ -86,7 +86,7 @@ export default function Information() {
         <p>where n is the length of the array.</p>
       </div>
       <div className="m-1 space-y-2">
-        <h1 className="text-center font-bold text-lg">Procedure</h1>
+        <h1 className="text-center font-bold">Procedure</h1>
         <ol className="list-decimal ps-5">
           <li>Click on the suitable control to simulate the find max element function.</li>
           <li>You can <em>Undo</em> and <em>Redo</em> actions or <em>Reset</em> the experiment by clicking on the respective buttons.</li>
