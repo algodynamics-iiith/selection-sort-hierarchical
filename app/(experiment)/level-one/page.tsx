@@ -384,7 +384,7 @@ export default function Experiment() {
       {/* Header */}
       <header
         id='headerBlock'
-        className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-blue-600 from-25% to-sky-600  shadow-lg'}
+        className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-blue-600 from-25% to-sky-600 shadow-lg'}
       >
       <span className={"flex px-4 font-sans text-xl md:text-2xl font-bold text-slate-50 col-span-2 lg:col-span-3 justify-self-start items-center"}>
           Driving Test - Selection Sort - Level One

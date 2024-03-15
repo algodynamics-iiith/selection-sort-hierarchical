@@ -349,7 +349,7 @@ export default function Experiment() {
       {/* Header */}
       <header
         id='headerBlock'
-        className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-blue-600 from-25% to-sky-600  shadow-lg'}
+        className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-blue-600 from-25% to-sky-600 shadow-lg'}
       >
         <span className={"flex px-4 font-sans text-xl md:text-2xl font-bold text-slate-50 col-span-2 lg:col-span-3 justify-self-start items-center"}>
           Driving Test - Selection Sort - Level Two
@@ -366,8 +366,8 @@ export default function Experiment() {
             <Instructions />
           </div>
           {/* Activity */}
-          <div className="w-full text-md lg:text-2xl overflow-x-auto">
-            <div className="flex relative h-full w-full">
+          <div className="w-full text-md lg:text-2xl overflow-auto">
+            <div className="flex relative min-h-full w-full">
               {/* Controls */}
               <div className={"flex flex-col min-h-0 min-w-0 flex-grow justify-evenly items-center overflow-auto"}>
                 {/* Prompt */}
@@ -386,7 +386,7 @@ export default function Experiment() {
                 {/* Variables */}
                 <div className="grid grid-cols-1 grid-rows-1 w-full items-center justify-center h-1/2">
                   <div className="flex w-full h-full justify-start items-center overflow-visible">
-                    <div className="flex flex-col justify-center items-center text-center w-1/6 h-full p-1 text-xl">
+                    <div className="flex flex-col justify-center items-center text-center w-1/6 h-full lg:p-1 text-md lg:text-2xl">
                       i = {state.i}
                       <br />
                       max = {state.max !== undefined ? state.max : "null"}
