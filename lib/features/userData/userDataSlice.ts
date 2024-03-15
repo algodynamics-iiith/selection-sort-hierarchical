@@ -6,7 +6,6 @@ type ThemeStates = "Light" | "Dark"
 // Selection Sort Level State Interface.
 export type LevelStateData = {
   level: number,
-  activityStatus: boolean,
   stateTimeline: SelectionSortState[],
   currentStateIndex: number,
 }
@@ -85,7 +84,6 @@ function initLevelState(level: number, initialState: SelectionSortState): LevelS
   let levelState: LevelStateData = {} as LevelStateData
 
   levelState.level = level
-  levelState.activityStatus = true
   levelState.stateTimeline = [{...initialState}]
   levelState.currentStateIndex = 0
 

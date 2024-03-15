@@ -34,15 +34,15 @@ export default function CreateArray({
   }
 
   return (
-    <div className="flex w-full justify-evenly items-start">
+    <div className="flex w-full justify-evenly items-start text-lg lg:text-2xl">
       {/* Value Names */}
-      <div className="flex flex-col justify-start items-center space-y-2">
-        <span className="p-3 text-sky-600 text-2xl">array:</span>
-        <span className="text-amber-600 text-2xl" hidden={hideIndex}>position:</span>
+      <div className="flex flex-col justify-start items-center space-y-1 lg:space-y-2">
+        <span className="p-2.5 lg:p-3.5 text-sky-600">array:</span>
+        <span className="text-amber-600" hidden={hideIndex}>position:</span>
       </div>
       {/* Array Elements */}
       {array.map((value, index) => {
-        return (<div className="flex flex-col justify-start items-center space-y-2" key={index}>
+        return (<div className="flex flex-col justify-start items-center space-y-1 lg:space-y-2" key={index}>
           {/* Element */}
           <ArrayElement
             value={value}
@@ -55,37 +55,37 @@ export default function CreateArray({
             }
           />
           {/* Position/Index */}
-          <span className="text-amber-600 text-2xl" hidden={hideIndex}>
+          <span className="text-amber-600" hidden={hideIndex}>
             {index}
           </span>
           {/* Index Pointer */}
-          <span className="text-amber-600 text-2xl" hidden={currentIndex === index ? false : true}>
+          <span className="text-amber-600" hidden={currentIndex === index ? false : true}>
             i
           </span>
           {/* Boundary Pointer */}
-          <span className="text-purple-600 text-2xl" hidden={currentBoundary === index ? false : true}>
+          <span className="text-purple-600" hidden={currentBoundary === index ? false : true}>
             b
           </span>
           {/* Fringe Pointer */}
-          <span className="text-purple-600 text-2xl" hidden={(currentBoundary && ((currentBoundary - 1) === index)) ? false : true}>
+          <span className="text-purple-600" hidden={(currentBoundary && ((currentBoundary - 1) === index)) ? false : true}>
             f
           </span>
           {/* Max Pointer */}
-          <span className="text-purple-600 text-2xl" hidden={currentMax === index ? false : true}>
+          <span className="text-purple-600" hidden={currentMax === index ? false : true}>
             max
           </span>
           {/* Min Pointer */}
-          <span className="text-purple-600 text-2xl" hidden={currentMin === index ? false : true}>
+          <span className="text-purple-600" hidden={currentMin === index ? false : true}>
             min
           </span>
         </div>)
       })}
       {/* Boundary Element */}
-      {(hideIndex !== true) && <div className="flex flex-col justify-start items-center space-y-2">
-        <div className="flex justify-center mt-1 px-5 py-7 text-2xl rounded-lg">{`${' '}`}</div>
-        <span className="text-amber-600 text-2xl" hidden={hideIndex}>{array.length}</span>
-        <span className="text-amber-600 text-2xl" hidden={currentIndex === array.length ? false : true}>i</span>
-        <span className="text-purple-600 text-2xl" hidden={currentBoundary === array.length ? false : true}>b</span>
+      {(hideIndex !== true) && <div className="flex flex-col justify-start items-center space-y-1 lg:space-y-2">
+        <div className="flex justify-center mt-8 lg:mt-9 p-2 lg:p-3 rounded-lg">{`${' '}`}</div>
+        <span className="text-amber-600" hidden={hideIndex}>{array.length}</span>
+        <span className="text-amber-600" hidden={currentIndex === array.length ? false : true}>i</span>
+        <span className="text-purple-600" hidden={currentBoundary === array.length ? false : true}>b</span>
       </div>}
     </div>
   )

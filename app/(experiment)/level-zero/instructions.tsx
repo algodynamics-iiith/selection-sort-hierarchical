@@ -5,12 +5,12 @@ export default function Information() {
   const theme = useAppSelector(selectTheme)
   return (
     <div className="flex-col space-y-4">
-      <h1 className="text-center font-bold text-lg">Objective</h1>
+      <h1 className="text-center font-bold">Objective</h1>
       <p>
         Apply Selection Sort Algorithm on the given array to sort it using the provided controls.
       </p>
       <div className="text-center m-1 flex-col justify-center space-y-2">
-        <h1 className="font-bold text-lg">Controls Description</h1>
+        <h1 className="font-bold">Controls Description</h1>
         <table className="w-full" id="variables-table">
           <thead>
             <tr>
@@ -33,7 +33,7 @@ export default function Information() {
         </table>
       </div>
       <div className="m-1 space-y-2">
-        <h1 className="text-center font-bold text-lg">Procedure</h1>
+        <h1 className="text-center font-bold">Procedure</h1>
         <ol className="list-decimal ps-5">
           <li>Click on the suitable control to simulate the selection sort algorithm.</li>
           <li>You can <em>Undo</em> and <em>Redo</em> actions or <em>Reset</em> the experiment by clicking on the respective buttons.</li>

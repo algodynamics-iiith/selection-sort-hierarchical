@@ -117,11 +117,10 @@ const Prompts = Object.freeze({
  * @param stateIndex Index of timeline element indicating the current experiment state.
  * @returns 
  */
-function createLevelState(level: number, status: boolean, timeline: SelectionSortState[], stateIndex: number): LevelStateData {
+function createLevelState(level: number, timeline: SelectionSortState[], stateIndex: number): LevelStateData {
   let levelState: LevelStateData = {} as LevelStateData
 
   levelState.level = level
-  levelState.activityStatus = status
   levelState.stateTimeline = timeline
   levelState.currentStateIndex = stateIndex
 
@@ -180,7 +179,6 @@ function initLevelState(levelState: LevelStateData) {
       // Create and store lower LevelStateData
       state = createLevelState(
         levelState.level - state.level + 1,
-        true,
         [newState],
         0
       )
@@ -218,7 +216,7 @@ function initLevelState(levelState: LevelStateData) {
         newState.b))
 
       // New level state.
-      state = createLevelState(state.level, true, newTimeline, newTimeline.length - 1)
+      state = createLevelState(state.level, newTimeline, newTimeline.length - 1)
     }
   }
   console.log("level:", levelNumber, "initLevelState:", state)
@@ -256,7 +254,7 @@ export default function Experiment() {
     newTimeline.push(newState)
     // Update states.
     setPreState({ ...state })
-    setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+    setLevelState(createLevelState(levelNumber, newTimeline, levelState.currentStateIndex + 1))
     setState(newState)
     setType(Action.FindMax)
     setPrompt(Prompts.FindMax)
@@ -273,7 +271,7 @@ export default function Experiment() {
       newTimeline.push(newState)
       // Update states.
       setPreState({ ...state })
-      setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+      setLevelState(createLevelState(levelNumber, newTimeline, levelState.currentStateIndex + 1))
       setState(newState)
       setType(Action.SwapMax)
       setPrompt(Prompts.SwapMax)
@@ -287,7 +285,7 @@ export default function Experiment() {
     newTimeline.push(newState)
     // Update states.
     setPreState({ ...state })
-    setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+    setLevelState(createLevelState(levelNumber, newTimeline, levelState.currentStateIndex + 1))
     setState(newState)
     setType(Action.DecrementBResetMaxI)
     setPrompt(Prompts.DecrementBResetMaxI)
@@ -309,7 +307,7 @@ export default function Experiment() {
     // Update states.
     setPreState({ ...state })
     setState(levelState.stateTimeline[levelState.currentStateIndex - 1])
-    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex - 1))
+    setLevelState(createLevelState(levelNumber, levelState.stateTimeline, levelState.currentStateIndex - 1))
     setType(Action.Undo)
     setPrompt(Prompts.Undo)
   }
@@ -318,7 +316,7 @@ export default function Experiment() {
     // Update states.
     setPreState({ ...state })
     setState(levelState.stateTimeline[levelState.currentStateIndex + 1])
-    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex + 1))
+    setLevelState(createLevelState(levelNumber, levelState.stateTimeline, levelState.currentStateIndex + 1))
     setType(Action.Redo)
     setPrompt(Prompts.Redo)
   }
@@ -327,7 +325,7 @@ export default function Experiment() {
     // New variables.
     let initState = initialLevelState.stateTimeline[0]
     let newTimeline = [createState(initState.array, initState.i, initState.max, initState.b)]
-    let newLevelState = createLevelState(levelNumber, true, newTimeline, 0)
+    let newLevelState = createLevelState(levelNumber, newTimeline, 0)
     // Update states.
     setPreState({ ...state })
     setLevelState(newLevelState)
@@ -338,7 +336,7 @@ export default function Experiment() {
 
   function handleDone() {
     // New variables.
-    const newLevelState = createLevelState(levelNumber, false, levelState.stateTimeline, levelState.currentStateIndex)
+    const newLevelState = createLevelState(levelNumber, levelState.stateTimeline, levelState.currentStateIndex)
     // Update states.
     setPreState({ ...state })
     setLevelState(newLevelState)
@@ -388,10 +386,10 @@ export default function Experiment() {
         id='headerBlock'
         className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-blue-600 from-25% to-sky-600  shadow-lg'}
       >
-        <span className={"px-4 font-sans text-2xl font-bold text-slate-50 col-span-3 justify-self-start"}>
+      <span className={"flex px-4 font-sans text-xl md:text-2xl font-bold text-slate-50 col-span-2 lg:col-span-3 justify-self-start items-center"}>
           Driving Test - Selection Sort - Level One
         </span>
-        <div className='col-span-1 flex justify-around items-center'>
+        <div className='col-span-2 lg:col-span-1 flex justify-around items-center'>
           <ThemeToggle />
         </div>
       </header>
@@ -399,18 +397,18 @@ export default function Experiment() {
       <Suspense fallback={<Loading />}>
         <div className="flex-grow flex overflow-hidden">
           {/* Information */}
-          <div className="max-w-lg overflow-y-auto shadow-md p-6 text-lg">
+          <div className="max-w-min md:max-w-min lg:max-w-2xl overflow-y-auto shadow-md p-4 lg:p-8 text-md lg:text-xl">
             <Instructions />
           </div>
           {/* Activity */}
-          <div className="w-full text-lg overflow-x-auto">
+          <div className="w-full text-md lg:text-2xl overflow-auto">
             <div className="relative h-full w-full">
               {/* Controls */}
               <div className={"flex flex-col justify-evenly items-center w-full h-full "}>
                 {/* Prompt */}
                 <div className="w-full">
                   <div className={
-                    "text-center m-4 p-2 rounded-md border-2 text-black "
+                    "text-center lg:m-4 p-1 lg:p-2 rounded-md border-2 text-black "
                     + ((prompt === Prompts.FindMax || prompt === Prompts.SwapMax)
                       ? "bg-green-300 border-green-400"
                       : "bg-blue-300 border-blue-400")}
@@ -421,7 +419,7 @@ export default function Experiment() {
                 {/* Variables */}
                 <div className="grid grid-cols-1 grid-rows-3 w-full items-center justify-center h-1/2">
                   <div className="flex w-full h-full row-start-2 justify-start items-start overflow-visible">
-                    <div className="flex flex-col justify-center items-center text-center w-1/6 h-full p-1 text-xl">
+                    <div className="flex flex-col justify-center items-center text-center w-1/6 h-full lg:p-1 text-md lg:text-2xl">
                       {/* i = {state.i}
                       <br />
                       max = {state.max}
@@ -512,7 +510,7 @@ export default function Experiment() {
         </div>
       </Suspense>
       {/* Copyright */}
-      <div className={"text-center p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
+      <div className={"text-center lg:text-xl p-2 border-t-2 " + (theme === "Dark" ? "border-gray-100" : "border-gray-900")}>
         Copyright &copy; 2023 Algodynamics.
       </div>
     </Layout>

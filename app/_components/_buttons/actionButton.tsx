@@ -17,8 +17,8 @@ export default function ActionButton({
     <button
       type="button"
       id={id}
-      className={"flex m-2 p-3 justify-center items-center "
-        + "rounded-md shadow-md text-black "
+      className={"flex m-1 p-2 lg:m-2 lg:p-4 justify-center items-center "
+        + "rounded-md shadow-md text-black lg:text-xl "
         + (disabled ? "" : "transition ease-out hover:scale-105 hover:duration-300 ")
         + (type === "primary"
           ? (disabled ? "bg-green-200" : "bg-green-300")

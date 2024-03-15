@@ -117,11 +117,10 @@ const Prompts = Object.freeze({
  * @param stateIndex Index of timeline element indicating the current experiment state.
  * @returns 
  */
-function createLevelState(level: number, status: boolean, timeline: SelectionSortState[], stateIndex: number): LevelStateData {
+function createLevelState(level: number, timeline: SelectionSortState[], stateIndex: number): LevelStateData {
   let levelState: LevelStateData = {} as LevelStateData
 
   levelState.level = level
-  levelState.activityStatus = status
   levelState.stateTimeline = timeline
   levelState.currentStateIndex = stateIndex
 
@@ -180,7 +179,6 @@ function initLevelState(levelState: LevelStateData) {
       // Create and store lower LevelStateData
       state = createLevelState(
         levelState.level - state.level + 1,
-        true,
         [newState],
         0
       )
@@ -218,7 +216,7 @@ function initLevelState(levelState: LevelStateData) {
         newState.b))
 
       // New level state.
-      state = createLevelState(state.level, true, newTimeline, newTimeline.length - 1)
+      state = createLevelState(state.level, newTimeline, newTimeline.length - 1)
     }
   }
 
@@ -253,7 +251,7 @@ export default function Experiment() {
       newTimeline.push(newState)
       // Update states.
       setPreState({ ...state })
-      setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+      setLevelState(createLevelState(levelNumber, newTimeline, levelState.currentStateIndex + 1))
       setState(newState)
       setType(Action.Increment)
       setPrompt(Prompts.Increment)
@@ -268,7 +266,7 @@ export default function Experiment() {
     newTimeline.push(newState)
     // Update states.
     setPreState({ ...state })
-    setLevelState(createLevelState(levelNumber, true, newTimeline, levelState.currentStateIndex + 1))
+    setLevelState(createLevelState(levelNumber, newTimeline, levelState.currentStateIndex + 1))
     setState(newState)
     setType(Action.UpdateMax)
     setPrompt(Prompts.UpdateMax)
@@ -278,7 +276,7 @@ export default function Experiment() {
     // Update states.
     setPreState({ ...state })
     setState(levelState.stateTimeline[levelState.currentStateIndex - 1])
-    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex - 1))
+    setLevelState(createLevelState(levelNumber, levelState.stateTimeline, levelState.currentStateIndex - 1))
     setType(Action.Undo)
     setPrompt(Prompts.Undo)
   }
@@ -287,7 +285,7 @@ export default function Experiment() {
     // Update states.
     setPreState({ ...state })
     setState(levelState.stateTimeline[levelState.currentStateIndex + 1])
-    setLevelState(createLevelState(levelNumber, true, levelState.stateTimeline, levelState.currentStateIndex + 1))
+    setLevelState(createLevelState(levelNumber, levelState.stateTimeline, levelState.currentStateIndex + 1))
     setType(Action.Redo)
     setPrompt(Prompts.Redo)
   }
@@ -296,7 +294,7 @@ export default function Experiment() {
     // New variables.
     let initState = initialLevelState.stateTimeline[0]
     let newTimeline = [createState(initState.array, initState.i, initState.max, initState.b)]
-    let newLevelState = createLevelState(levelNumber, true, newTimeline, 0)
+    let newLevelState = createLevelState(levelNumber, newTimeline, 0)
     // Update states.
     setPreState({ ...state })
     setLevelState(newLevelState)
@@ -307,7 +305,7 @@ export default function Experiment() {
 
   function handleDone() {
     // New variables.
-    const newLevelState = createLevelState(levelNumber, false, levelState.stateTimeline, levelState.currentStateIndex)
+    const newLevelState = createLevelState(levelNumber, levelState.stateTimeline, levelState.currentStateIndex)
     // Update states.
     setPreState({ ...state })
     setLevelState(newLevelState)

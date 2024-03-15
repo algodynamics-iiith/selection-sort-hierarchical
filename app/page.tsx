@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const orgOfPOC: string = "International Institute of Information Technology, Hyderabad";
 const nameOfPOC: string = "Gnaneswar Kulindala";
 const emailOfPOC: string = "gnaneswar.kulindala@research.iiit.ac.in";
-const mobileOfPOC: string = "+91 79894 73223";
+const mobileOfPOC: string = "";
 
 export default function Home() {
   return (
@@ -20,7 +20,7 @@ export default function Home() {
         id='headerBlock'
         className={'grid p-4 grid-cols-4 justify-around bg-gradient-to-r from-sky-600 via-blue-600 to-sky-600  shadow-lg'}
       >
-        <div className="px-4 font-sans text-2xl font-bold text-slate-50 col-span-2 col-start-2 justify-self-center">
+        <div className="flex px-4 font-sans text-2xl font-bold text-slate-50 col-span-3 lg:col-span-2 col-start-1 lg:col-start-2 justify-self-center items-center">
           Driving Test - Selection Sort Algorithm
         </div>
         <div className="flex col-start-4 justify-center items-center">

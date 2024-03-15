@@ -17,7 +17,7 @@ export default function ArrayElement({
 }) {
   return (
     <span
-      className={"flex justify-center p-3 border-2 border-sky-600 text-black text-2xl rounded-lg "
+      className={"flex justify-center p-2 lg:p-3 border-2 border-sky-600 text-black text-xl lg:text-2xl rounded-lg "
         + (highlight
           ? "border-dashed bg-yellow-300"
           : sorted
