@@ -30,32 +30,38 @@ export default function Home() {
       <div className="flex flex-grow justify-center items-start overflow-y-auto">
         <div className="container flex-grow flex flex-col justify-evenly p-12 lg:px-24">
           <h1 className="text-2xl">Consent Form </h1>
-          <h2 className="text-xl">Purpose of the Research</h2>
+          <h2 className="text-xl">Purpose of the Tool</h2>
           <p className="py-3">
             This activity is part of a research study conducted
             for algodynamics. The aim of the research is to
-            <strong>&nbsp;explore understanding of the algorithm</strong>.
+            <strong>&nbsp;explore understanding of algorithms</strong>.
           </p>
-          <h2 className="text-xl">Your Role in the Research</h2>
+          {/* <h2 className="text-xl">Your role in the Research</h2> */}
+          <h2 className="text-xl">Brief about the tool</h2>
           <p className="py-3">
-            You will take an interactive game like test about an algorithm. No
-            special preparation is required.
+            This is an interactive game-like tool built around the
+            selection&npsb;sort algorithm. No special preparation is required.
           </p>
           <h2 className="text-xl">Time Required</h2>
           <p className="py-3">The whole process might take around 15 minutes.</p>
           <h2 className="text-xl">Risks</h2>
           <p className="py-3">
-            There is no risk for the participants. Participation in this survey is
+            {/* There is no risk for the participants. Participation in this survey is
             completely voluntary. You can withdraw your consent to participate at
-            any time.
+            any time. */}
+            There is no risk for the participants. You can exit at any time.
           </p>
           <h2 className="text-xl">Data Protection</h2>
-          <p className="py-3">
+          {/* <p className="py-3">
             Your<strong>&nbsp;data will remain confidential&nbsp;</strong>and
             will be used for research purposes only. The research may result in
             scientific publications, conference and seminar presentations, and
             teaching. No direct identifiers (ex: name, address, photo, video) will
             be collected as part of the survey.
+          </p> */}
+          <p className="py-3">
+            <strong>No data&nbsp;</strong>(personal identifiers, usage data,
+            etc.) is collected as part of the tool demonstration.
           </p>
           <h2 className="text-xl">Contact Information</h2>
           <ol className="py-2">
@@ -68,9 +74,9 @@ export default function Home() {
             </li>
           </ol>
           <p className="py-3">
-            Please click on the agree button below to start the test.
+            Please click on the Start button below to start the tool.
           </p>
-          <AgreeButton route="/level-zero" />
+          <AgreeButton route="/level-zero" start />
         </div>
       </div>
     </Layout>

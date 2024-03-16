@@ -109,9 +109,11 @@ const onClickAgree = async (
  * @returns Button which carries out the Agree function.
  */
 function AgreeButton({
-  route
+  route,
+  start
 }: {
-  route: string
+  route: string,
+  start?: boolean
 }) {
   // Axios client for backend.
   let client: AxiosInstance | null = null
@@ -146,7 +148,7 @@ function AgreeButton({
       // Read Roll Number, generate userID and call getAlgorithm function to fetch algorithmID.
       onClick={(e) => onClickAgree(e, router, client, handleUpdateUserId, route)}
     >
-      Agree
+      {start? "Start" : "Agree"}
     </button>
   )
 }
