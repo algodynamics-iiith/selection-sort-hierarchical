@@ -29,7 +29,8 @@ export default function Home() {
       </header>
       <div className="flex flex-grow justify-center items-start overflow-y-auto">
         <div className="container flex-grow flex flex-col justify-evenly p-12 lg:px-24">
-          <h1 className="text-2xl">Consent Form </h1>
+          {/* <h1 className="text-2xl">Consent Form </h1> */}
+          <h1 className="text-2xl">Introduction</h1>
           <h2 className="text-xl">Purpose of the Tool</h2>
           <p className="py-3">
             This activity is part of a research study conducted
