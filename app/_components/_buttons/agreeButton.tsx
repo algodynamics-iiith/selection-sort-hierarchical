@@ -2,69 +2,22 @@
 
 import { useRouter } from 'next/navigation'
 import { MouseEvent, useEffect } from 'react'
-import { AxiosInstance } from 'axios'
-import backendClient from '../../api'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
-import { selectUserId, updateUserId } from '@/lib/features/userData/userDataSlice'
-
-/**
- * Function to fetch the algorithmID and redirect the user to the experiment page.
- * @param input userID.
- * @param router Next.js router object.
- * @param client Axios client for backend.
- * @param setUserId Function to store userId.
- * @param route Page to redirect to.
- */
-const getAlgorithm = async (
-  input: string,
-  router: ReturnType<typeof useRouter>,
-  client: AxiosInstance | null,
-  setUserId: Function,
-  route: string,
-) => {
-  console.log("Entered getAlgorithm")
-  // Path to use getAlgorithm API.
-  let final = "/getAlgorithm/" + input
-  if (!client) {
-    // Update userId in the store for accessing across pages.
-    setUserId(input)
-    // Redirect to the experiment.
-    router.replace(route)
-  }
-  else {
-    // Fetch the algorithmId.
-    await client
-      .get(final)
-      .then((response: any) => {
-        // Read userID and algorithmID and store them in local storage.
-        let id: string = response.data.id
-        let algorithmId: string = response.data.algorithmId
-        localStorage.setItem("userID", id)
-        // Update userId in the store for accessing across pages.
-        setUserId(id)
-        console.log("Set userId.")
-        localStorage.setItem("algorithmID", algorithmId)
-      })
-      .catch((error: any) => {
-        console.log(error)
-        alert("Something went wrong.")
-      })
-  }
-}
+import { selectRollNumber, updateRollNumber } from '@/lib/features/userData/userDataSlice'
 
 /**
  * Function to create/fetch userID and proceed with getAlgorithm API.
  * @param e (optional) HTML element whose properties can be modified.
  * @param router Next.js router object.
- * @param client Axios client for backend.
- * @param setUserId Function to store userId.
+ * @param backend Boolean to indicate usage of backend.
+ * @param setRollNumber Function to store userId.
  * @param route Page to redirect to.
  */
 const onClickAgree = async (
   e: MouseEvent<HTMLButtonElement>,
   router: ReturnType<typeof useRouter>,
-  client: AxiosInstance | null,
-  setUserId: Function,
+  backend: boolean,
+  setRollNumber: Function,
   route: string,
 ) => {
   // Logging for testing.
@@ -77,29 +30,27 @@ const onClickAgree = async (
   // Add gray color
   e.currentTarget.classList.add("bg-gray-500")
 
-  // Call createUser API to generate userID.
-  if (client) {
-    let input = ""
+  // Read rollNumber of user if backend storage is enabled.
+  if (backend) {
+    let input: string | null = ""
     while (input === "") {
-      // Prompt for userID.
-      const id = prompt("Please enter your roll number.")
-      if (id !== null) {
-        // Create user or check if already existing through endpoint.
-        const res = await client.get("/createUser/" + id)
-        input = res.data.id
-        // Store userId in local storage.
-        localStorage.setItem("userID", input)
-        // Get the algorithmId.
-        getAlgorithm(input, router, client, setUserId, route)
+      // Prompt for user identifier.
+      input = prompt("Please enter your roll number.")
+      if (input !== null) {
+        // Store user identifier in local storage.
+        setRollNumber(input)
+        localStorage.setItem("rollNumber", input)
+        router.replace(route)
       }
       else
         alert("Please enter your roll number to proceed further!")
     }
   }
-  // When no client is provided.
+  // When backend storage is disabled.
   else {
-    // Get the algorithmId.
-    getAlgorithm("testUserID", router, client, setUserId, route)
+    // Set testRollNumber.
+    setRollNumber("testRollNumber")
+    router.replace(route)
   }
 }
 
@@ -115,29 +66,25 @@ function AgreeButton({
   route: string,
   start?: boolean
 }) {
-  // Axios client for backend.
-  let client: AxiosInstance | null = null
-  // Update the backend for other functions to refer.
-  if (backendClient.getUri() !== undefined)
-    client = backendClient
-
+  let backend = true
   // Router for navigation between pages.
   const router = useRouter()
-  // Fetching the userId.
-  const userId = useAppSelector(selectUserId)
+  // Fetching the rollNumber.
+  const rollNumber = useAppSelector(selectRollNumber)
 
+  // If there already exists a rollNumber.
   useEffect(() => {
-    console.log("userId:", userId)
-    if (userId !== "") {
+    console.log("rollNumber:", rollNumber)
+    if (rollNumber !== "") {
       console.log("Redirecting to experiment.")
       router.replace(route)
     }
-  }, [router, userId, route])
+  }, [router, rollNumber, route])
 
   // Function to update the userId.
   const dispatch = useAppDispatch();
-  const handleUpdateUserId = (id: string) => {
-    dispatch(updateUserId(id))
+  const handleUpdateRollNumber = (id: string) => {
+    dispatch(updateRollNumber(id))
   }
 
   return (
@@ -145,8 +92,8 @@ function AgreeButton({
       type="button"
       id="agree"
       className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-4 m-1 rounded text-lg"
-      // Read Roll Number, generate userID and call getAlgorithm function to fetch algorithmID.
-      onClick={(e) => onClickAgree(e, router, client, handleUpdateUserId, route)}
+      // Read Roll Number and switch to experiment.
+      onClick={(e) => onClickAgree(e, router, backend, handleUpdateRollNumber, route)}
     >
       {start? "Start" : "Agree"}
     </button>

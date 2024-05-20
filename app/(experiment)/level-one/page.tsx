@@ -6,14 +6,13 @@ import ActionButton from "@/app/_components/_buttons/actionButton"
 import CreateArray from "@/app/_components/_constructors/createArray"
 import ThemeToggle from "@/app/_components/_buttons/darkModeToggleButton"
 import { Suspense, useEffect, useState } from "react"
-import API from "@/app/api"
+import backendClient from "@/app/_components/_backend/backendClient"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import {
   selectTheme,
-  selectUserId,
+  selectRollNumber,
   SelectionSortState,
-  selectRunId,
   selectLevelState,
   storeLevelState,
   LevelStateData
@@ -21,65 +20,7 @@ import {
 import Loading from "./loading"
 
 const levelNumber = 1
-
-// API Function Calls
-
-/**
- * API call to update the Run parameters.
- * @param payload Payload for the API.
- * @param runId The runId of the current run.
- * @param level The level number.
- * @param type The action performed.
- * @param preState The state before the action.
- * @param postState The state after the action.
- */
-const updateRun = async (
-  payload: any,
-  runId: string,
-  level: number,
-  type: string,
-  preState: SelectionSortState,
-  postState: SelectionSortState
-) => {
-  // If runId is undefined, then the user has not been initialised.
-  if (runId === "") {
-    return
-  }
-  // Log the current state into the browser console.
-  console.log(JSON.stringify({
-    id: runId,
-    payload: payload === undefined ? {} : payload,
-    level: level,
-    type: type,
-    preState: preState === undefined ? {} : preState,
-    postState: postState === undefined ? {} : postState,
-    timestamp: Date.now()
-  }))
-  // If API Gateway is defined.
-  if (API.getUri() !== undefined) {
-    // API call.
-    await API
-      .post(
-        `/updateRun`,
-        JSON.stringify({
-          id: runId,
-          payload: payload === undefined ? {} : payload,
-          level: level,
-          type: type,
-          preState: preState === undefined ? {} : preState,
-          postState: postState === undefined ? {} : postState,
-          timestamp: Date.now()
-        })
-      )
-      .then(response => {
-        console.log(response)
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-}
+const experimentName = "SelectionSortHierarchicalDT"
 
 // List of Actions
 const Action = Object.freeze({
@@ -230,9 +171,8 @@ export default function Experiment() {
   // Store Reducer dispatcher.
   const dispatch = useAppDispatch()
   // Initialisation.
-  const userId = useAppSelector(selectUserId)
+  const rollNumber = useAppSelector(selectRollNumber)
   const theme = useAppSelector(selectTheme)
-  const runId = useAppSelector(selectRunId)
   const initialLevelState = initLevelState(useAppSelector(selectLevelState))
   const [levelState, setLevelState] = useState<LevelStateData>(initialLevelState)
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
@@ -359,25 +299,19 @@ export default function Experiment() {
 
   // Log actions.
   useEffect(() => {
-    console.log(
-      "userId:", userId,
-      "runId:", runId,
-      "status:", levelState
-    )
+    console.log("status:", levelState)
+    console.log("L1 rollNumber:", rollNumber)
+    backendClient(rollNumber, experimentName, initialLevelState.stateTimeline[0], type, 'experiment')
     // Redirect to lower level upon clicking Dive In Find Max.
     if (type === Action.DiveIntoLevelTwo) {
       router.replace("/level-two")
-    }
-    // Log run actions.
-    else if (runId !== "") {
-      updateRun({}, runId, levelNumber, type, preState, state)
     }
     // Redirect upon completion.
     if (completed) {
       dispatch(storeLevelState(levelState))
       router.replace("/level-zero")
     }
-  }, [router, userId, runId, type, preState, state, completed])
+  }, [router, type, preState, state, completed])
 
   return (
     <Layout >

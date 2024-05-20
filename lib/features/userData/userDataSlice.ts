@@ -21,8 +21,7 @@ export type SelectionSortState = {
 
 // Define a type for the slice state
 export interface UserDataState {
-  userId: string,
-  runId: string,
+  rollNumber: string,
   theme: ThemeStates,
   levelState: LevelStateData,
 }
@@ -94,8 +93,7 @@ const initialLevelStateData = initLevelState(0, initialSelectionSortState)
 
 // Define the initial state using that type
 const initialState: UserDataState = {
-  userId: "",
-  runId: "",
+  rollNumber: "",
   theme: "Light",
   levelState: initialLevelStateData,
 }
@@ -106,14 +104,10 @@ export const userDataSlice = createSlice({
   initialState,
   reducers: {
     // Use the PayloadAction type to declare the contents of `action.payload`
-    // Update the userId
-    updateUserId: (state, action: PayloadAction<string>) => {
-      state.userId = action.payload
-    },
-    // Update the runId
-    updateRunId: (state, action: PayloadAction<string>) => {
-      state.runId = action.payload
-      console.log("New runId:", state.runId)
+    // Update the rollNumber
+    updateRollNumber: (state, action: PayloadAction<string>) => {
+      state.rollNumber = action.payload
+      console.log("Roll Number:", state.rollNumber)
     },
     // Update the theme
     updateTheme: (state, action: PayloadAction<ThemeStates>) => {
@@ -141,11 +135,10 @@ export const userDataSlice = createSlice({
   }
 })
 
-export const { updateUserId, updateRunId, updateTheme, storeLevelState } = userDataSlice.actions
+export const { updateRollNumber, updateTheme, storeLevelState } = userDataSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectUserId = (state: RootState) => state.userData.userId
-export const selectRunId = (state: RootState) => state.userData.runId
+export const selectRollNumber = (state: RootState) => state.userData.rollNumber
 export const selectTheme = (state: RootState) => state.userData.theme
 export const selectLevelState = (state: RootState) => state.userData.levelState
 export const selectInitialArray = () => initialArray

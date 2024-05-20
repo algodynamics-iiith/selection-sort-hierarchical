@@ -6,147 +6,21 @@ import ActionButton from "@/app/_components/_buttons/actionButton"
 import CreateArray from "@/app/_components/_constructors/createArray"
 import ThemeToggle from "@/app/_components/_buttons/darkModeToggleButton"
 import { Suspense, useEffect, useState } from "react"
-import API from "@/app/api"
+import backendClient from "@/app/_components/_backend/backendClient"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import {
   selectTheme,
-  selectUserId,
+  selectRollNumber,
   SelectionSortState,
-  storeLevelState,
-  updateRunId,
   selectLevelState,
-  selectRunId,
+  storeLevelState,
   LevelStateData
 } from "@/lib/features/userData/userDataSlice"
 import Loading from "./loading"
 
 const levelNumber = 0
-
-// API Function Calls
-
-/**
- * API call to create a run for a userId and set the runId.
- * @param userId The userId of the user.
- * @param setRunId Function to set the runId.
- * @param dispatch Function to dispatch hook to store the runId in store.
- */
-const createRun = async (
-  userId: string,
-  setRunId: React.Dispatch<React.SetStateAction<string>>,
-  storeRunId: Function
-) => {
-  console.log("Creating runId.")
-  // If API Gateway is defined.
-  if (API.getUri() !== undefined) {
-    // API call.
-    await API
-      .post(
-        `/createRun`, JSON.stringify({
-          id: userId,
-          machineId: "selectionSortHierarchical",
-        })
-      )
-      .then((response: any) => {
-        // Set the runId for the page.
-        setRunId(response.data.id)
-        // Store the runId in the redux store.
-        storeRunId(response.data.id)
-      })
-      .catch((error: any) => {
-        console.log(error)
-      })
-  }
-  // If testing.
-  else {
-    // Set the runId for the page.
-    setRunId("testRunID")
-    // Store the runId in the redux store.
-    storeRunId("testRunID")
-  }
-}
-
-/**
- * API call to update the Run parameters.
- * @param payload Payload for the API.
- * @param runId The runId of the current run.
- * @param level The level number.
- * @param type The action performed.
- * @param preState The state before the action.
- * @param postState The state after the action.
- */
-const updateRun = async (
-  payload: any,
-  runId: string,
-  level: number,
-  type: string,
-  preState: SelectionSortState,
-  postState: SelectionSortState
-) => {
-  // If runId is undefined, then the user has not been initialised.
-  if (runId === "") {
-    return
-  }
-  // Log the current state into the browser console.
-  console.log(JSON.stringify({
-    id: runId,
-    payload: payload === undefined ? {} : payload,
-    level: level,
-    type: type,
-    preState: preState === undefined ? {} : preState,
-    postState: postState === undefined ? {} : postState,
-    timestamp: Date.now()
-  }))
-  // If API Gateway is defined.
-  if (API.getUri() !== undefined) {
-    // API call.
-    await API
-      .post(
-        `/updateRun`,
-        JSON.stringify({
-          id: runId,
-          payload: payload === undefined ? {} : payload,
-          level: level,
-          type: type,
-          preState: preState === undefined ? {} : preState,
-          postState: postState === undefined ? {} : postState,
-          timestamp: Date.now()
-        })
-      )
-      .then(response => {
-        console.log(response)
-        console.log(response.data)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-}
-
-/**
- * API call to update that the run is completed.
- * @param id The userId of the user of the current run.
- * @param setCompleted Function to set the status to completed.
- */
-const complete = async (id: string, setCompleted: React.Dispatch<React.SetStateAction<boolean>>) => {
-  let endpoint = `/complete/` + id
-  // If API Gateway is defined.
-  if (API.getUri() !== undefined) {
-    // API call.
-    await API
-      .get(endpoint)
-      .then(response => {
-        console.log(response)
-        console.log(response.data)
-        setCompleted(true)
-        // window.alert("Thank you for your participation.")
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-  else { setCompleted(true) }
-}
+const experimentName = "SelectionSortHierarchicalDT"
 
 // List of Actions
 const Action = Object.freeze({
@@ -325,19 +199,15 @@ export default function Experiment() {
   // Store Reducer dispatcher.
   const dispatch = useAppDispatch()
   // Initialisation.
-  const userId = useAppSelector(selectUserId)
+  const rollNumber = useAppSelector(selectRollNumber)
   const theme = useAppSelector(selectTheme)
   const initialLevelState = initLevelState(useAppSelector(selectLevelState))
   const [levelState, setLevelState] = useState<LevelStateData>(initialLevelState)
-  const [runId, setRunId] = useState<string>(useAppSelector(selectRunId))
   const [preState, setPreState] = useState<SelectionSortState>({} as SelectionSortState)
   const [state, setState] = useState<SelectionSortState>(initialLevelState.stateTimeline[initialLevelState.currentStateIndex])
   const [type, setType] = useState<string>(Action.Init)
   const [prompt, setPrompt] = useState<string>(Prompts.Init)
   const [completed, setCompleted] = useState<boolean>(false)
-
-  // Function to handle updating runId.
-  function storeRunId(id: string) { dispatch(updateRunId(id)) }
 
   // Handlers.
   function handleSelectionSort() {
@@ -415,7 +285,7 @@ export default function Experiment() {
     setState({ ...state })
     setType(Action.ConfirmSubmit)
     setPrompt(Prompts.ConfirmSubmit)
-    if (runId !== "") { complete(runId, setCompleted) }
+    setCompleted(true)
   }
 
   function handleCancelSubmit() {
@@ -437,32 +307,22 @@ export default function Experiment() {
     }
     return sorted
   }
-
   // Log actions.
   useEffect(() => {
-    console.log(
-      "userId:", userId,
-      "runId:", runId,
-      "status:", levelState
-    )
-    // Generating Run ID upon initialisation.
-    if (userId !== "" && runId === "") {
-      createRun(userId, setRunId, storeRunId)
-    }
+    console.log("status:", levelState)
+    console.log("L0 rollNumber:", rollNumber)
+    const actionType = (type === Action.Init ? 'init' : (type === Action.ConfirmSubmit ? 'submit' : 'experiment'))
+    backendClient(rollNumber, experimentName, initialLevelState.stateTimeline[0], type, actionType)
     // Redirect to lower level upon clicking Dive In.
-    else if (type === Action.DiveIntoLevelOne) {
+    if (type === Action.DiveIntoLevelOne) {
       router.replace("/level-one")
-    }
-    // Log run actions.
-    else if (runId !== "") {
-      updateRun({}, runId, levelNumber, type, preState, state)
     }
     // Redirect upon completion.
     if (completed) {
       dispatch(storeLevelState(levelState))
       router.replace("/thanks")
     }
-  }, [router, userId, runId, type, preState, state, completed])
+  }, [router, type, preState, state, completed])
 
   return (
     <Layout >
