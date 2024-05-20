@@ -4,7 +4,7 @@ import Layout from '@/app/layout'
 import ActionButton from '@/app/_components/_buttons/actionButton'
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
-import { selectTheme, updateRunId, updateUserId } from '@/lib/features/userData/userDataSlice'
+import { selectTheme, updateRollNumber } from '@/lib/features/userData/userDataSlice'
 import ThemeToggle from '../_components/_buttons/darkModeToggleButton'
 
 export default function Home() {
@@ -14,17 +14,13 @@ export default function Home() {
 
   // Functions to update the userId and runId.
   const dispatch = useAppDispatch();
-  const handleUpdateUserId = (id: string) => {
-    dispatch(updateUserId(id))
-  }
-  const handleUpdateRunId = (id: string) => {
-    dispatch(updateRunId(id))
+  const handleUpdateRollNumber = (id: string) => {
+    dispatch(updateRollNumber(id))
   }
 
   // Function to reset userId and return to homepage.
   function handleHome() {
-    handleUpdateUserId("")
-    handleUpdateRunId("")
+    handleUpdateRollNumber("")
     router.replace('/')
   }
 

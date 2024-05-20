@@ -2,6 +2,7 @@ import Layout from './layout'
 import type { Metadata } from 'next'
 import AgreeButton from './_components/_buttons/agreeButton'
 import ThemeToggle from './_components/_buttons/darkModeToggleButton';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Driving Test - Selection Sort',
@@ -41,31 +42,52 @@ export default function Home() {
           <h2 className="text-xl">Brief about the tool</h2>
           <p className="py-3">
             This is an interactive game-like tool built around the
-            selection&npsb;sort algorithm. No special preparation is required.
+            selection&nbsp;sort algorithm. No special preparation is required.
           </p>
           <h2 className="text-xl">Time Required</h2>
-          <p className="py-3">The whole process might take around 15 minutes.</p>
+          <p className="py-3">The whole process might take around 10 minutes.</p>
           <h2 className="text-xl">Risks</h2>
           <p className="py-3">
-            {/* There is no risk for the participants. Participation in this survey is
-            completely voluntary. You can withdraw your consent to participate at
-            any time. */}
-            There is no risk for the participants. You can exit at any time.
+            There is no risk for the participants. Participation in this survey is
+            completely voluntary.
+            {/* There is no risk for the participants. You can exit at any time. */}
           </p>
+          <p className="pb-3">
+            You can withdraw your consent to participate at any time by writing to the
+            point of contact mentioned below.</p>
           <h2 className="text-xl">Data Protection</h2>
-          {/* <p className="py-3">
+          <p className="py-3">
             Your<strong>&nbsp;data will remain confidential&nbsp;</strong>and
             will be used for research purposes only. The research may result in
             scientific publications, conference and seminar presentations, and
             teaching. No direct identifiers (ex: name, address, photo, video) will
             be collected as part of the survey.
-          </p> */}
-          <p className="py-3">
+          </p>
+          <p className="pb-3">
+            You may refer to the following links for the policies of the services 
+            used to run this tool, which involve storage of the experiment data collected.
+          </p>
+          <p>
+            <Link className="text-blue-500" href={"https://supabase.com/privacy"}>
+              Supabase Privacy Policy
+            </Link>
+          </p>
+          <p>
+            <Link className="text-blue-500" href={"https://supabase.com/aup"}>
+              Supabase Acceptable Use Policy
+            </Link>
+          </p>
+          <p className="pb-3">
+            <Link className="text-blue-500" href={"https://supabase.com/terms"}>
+              Supabase Terms of Service
+            </Link>
+          </p>
+          {/* <p className="py-3">
             <strong>No data&nbsp;</strong>(personal identifiers, usage data,
             etc.) is collected as part of the tool demonstration.
-          </p>
+          </p> */}
           <h2 className="text-xl">Contact Information</h2>
-          <ol className="py-2">
+          <ol className="py-3">
             <li>
               <span>{nameOfPOC}</span>{(orgOfPOC !== "") && (<span>, {orgOfPOC}</span>)}
               <ol className="list-disc list-inside py-3">
@@ -74,10 +96,10 @@ export default function Home() {
               </ol>
             </li>
           </ol>
-          <p className="py-3">
-            Please click on the Start button below to start the tool.
+          <p className="pb-3">
+            Please click on the Agree button below to start the tool.
           </p>
-          <AgreeButton route="/level-zero" start />
+          <AgreeButton route="/level-zero" />
         </div>
       </div>
     </Layout>

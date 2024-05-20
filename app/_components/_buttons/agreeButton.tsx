@@ -33,7 +33,7 @@ const onClickAgree = async (
   // Read rollNumber of user if backend storage is enabled.
   if (backend) {
     let input: string | null = ""
-    while (input === "") {
+    while ((input === "") || (input === null)) {
       // Prompt for user identifier.
       input = prompt("Please enter your roll number.")
       if (input !== null) {
